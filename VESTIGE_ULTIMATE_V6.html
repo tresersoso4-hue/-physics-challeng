@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>VESTIGE — The Science of Protection</title>
+<meta name="theme-color" content="#070a0d">
+<style>
+:root{
+ --bg:#05080b; --panel:rgba(13,18,23,.72); --line:rgba(185,210,220,.15);
+ --text:#edf5f7; --muted:#7f929a; --cyan:#8de9ff; --cyan2:#2fc7e8;
+ --green:#7df2ba; --amber:#ffd27a; --red:#ff6e75;
+ --shadow:0 30px 90px rgba(0,0,0,.55);
+}
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;height:100%;background:var(--bg);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;overflow:hidden}
+button{font:inherit;color:inherit}
+.app{width:100%;height:100%;position:relative;overflow:hidden;background:
+ radial-gradient(circle at 50% 35%,rgba(62,115,130,.13),transparent 34%),
+ radial-gradient(circle at 90% 80%,rgba(38,142,164,.08),transparent 30%),#05080b}
+.app:before{content:"";position:absolute;inset:0;pointer-events:none;opacity:.22;background-image:linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);background-size:55px 55px;mask-image:linear-gradient(to bottom,transparent,#000 20%,#000 85%,transparent)}
+.scanline{position:absolute;inset:0;pointer-events:none;opacity:.08;background:linear-gradient(transparent 49%,rgba(150,240,255,.3) 50%,transparent 51%);background-size:100% 7px;mix-blend-mode:screen}
+.noise{position:absolute;inset:-50%;pointer-events:none;opacity:.035;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140' viewBox='0 0 140 140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.5'/%3E%3C/svg%3E");animation:noise .25s steps(2) infinite}
+@keyframes noise{0%{transform:translate(0,0)}25%{transform:translate(2%,1%)}50%{transform:translate(-1%,2%)}75%{transform:translate(1%,-2%)}100%{transform:translate(0,0)}}
+
+.topbar{position:absolute;z-index:20;top:0;left:0;right:0;height:74px;padding:18px 26px;display:flex;align-items:center;justify-content:space-between}
+.brand{font-size:13px;letter-spacing:.32em;font-weight:800}.brand span{color:var(--cyan)}
+.top-actions{display:flex;gap:8px;align-items:center}
+.icon-btn,.ghost-btn{border:1px solid var(--line);background:rgba(8,12,16,.55);backdrop-filter:blur(16px);border-radius:11px;padding:10px 13px;cursor:pointer;transition:.25s}
+.icon-btn:hover,.ghost-btn:hover{border-color:rgba(141,233,255,.55);transform:translateY(-1px)}
+.profile{display:flex;gap:10px;align-items:center;border:1px solid var(--line);background:rgba(8,12,16,.55);padding:6px 9px;border-radius:13px;backdrop-filter:blur(16px);cursor:pointer}
+.avatar{width:34px;height:34px;border-radius:9px;display:grid;place-items:center;background:linear-gradient(135deg,#dceef2,#5b747c);color:#071014;font-weight:900}.ptext small{display:block;color:var(--muted);font-size:9px;letter-spacing:.15em}.ptext b{font-size:12px}
+
+.screen{position:absolute;inset:0;display:none;animation:screenIn .45s ease both}.screen.active{display:block}
+@keyframes screenIn{from{opacity:0;transform:scale(1.015)}to{opacity:1;transform:none}}
+.home{padding:90px 28px 24px;display:grid;grid-template-columns:1.02fr 1.4fr .9fr;grid-template-rows:1fr 142px;gap:18px;height:100%}
+.hero-copy{align-self:center;max-width:560px;padding:12px}
+.eyebrow{font-size:10px;letter-spacing:.32em;color:var(--cyan);font-weight:800;margin-bottom:16px}
+h1{font-size:clamp(48px,6.8vw,108px);line-height:.84;letter-spacing:-.06em;margin:0 0 25px;font-weight:850}
+.hero-copy p{color:#93a6ae;max-width:430px;line-height:1.65;font-size:13px}
+.play{margin-top:22px;border:1px solid rgba(141,233,255,.55);background:linear-gradient(180deg,rgba(141,233,255,.12),rgba(141,233,255,.03));padding:15px 24px;border-radius:12px;cursor:pointer;font-weight:800;letter-spacing:.12em;font-size:11px;box-shadow:0 0 35px rgba(47,199,232,.08);transition:.25s}
+.play:hover{background:rgba(141,233,255,.17);box-shadow:0 0 50px rgba(47,199,232,.16);transform:translateY(-2px)}
+.hero-stage{position:relative;display:grid;place-items:center;min-height:450px}
+.orbit{position:absolute;width:min(34vw,540px);aspect-ratio:1;border:1px solid rgba(141,233,255,.12);border-radius:50%;box-shadow:inset 0 0 80px rgba(47,199,232,.04);animation:orbit 18s linear infinite}
+.orbit:before,.orbit:after{content:"";position:absolute;inset:11%;border:1px dashed rgba(141,233,255,.1);border-radius:50%}.orbit:after{inset:28%}
+@keyframes orbit{to{transform:rotate(360deg)}}
+.armor-wrap{position:relative;width:min(33vw,470px);height:min(58vh,610px);perspective:1200px;cursor:grab;filter:drop-shadow(0 40px 55px rgba(0,0,0,.65))}
+.armor-wrap:active{cursor:grabbing}
+.armor3d{position:absolute;inset:0;transform-style:preserve-3d;transition:transform .12s ease;animation:float 4.5s ease-in-out infinite}
+@keyframes float{50%{translate:0 -8px}}
+.plate{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);transform-style:preserve-3d;clip-path:polygon(25% 3%,75% 3%,91% 18%,88% 85%,72% 98%,28% 98%,12% 85%,9% 18%);width:62%;height:78%;background:
+linear-gradient(110deg,#18242a,#091015 28%,#25353c 50%,#0b1115 72%,#1d2b31);
+border:1px solid rgba(188,220,226,.25);box-shadow:inset 0 0 35px rgba(255,255,255,.05),0 0 40px rgba(46,195,225,.09)}
+.plate:before{content:"";position:absolute;inset:7%;clip-path:inherit;border:1px solid rgba(141,233,255,.2);background:linear-gradient(135deg,transparent 30%,rgba(141,233,255,.05),transparent 70%)}
+.plate.p2{width:52%;height:66%;transform:translate(-50%,-50%) translateZ(28px);background:linear-gradient(105deg,#0d151a,#3a4d54 45%,#10181d);opacity:.88}
+.plate.p3{width:43%;height:54%;transform:translate(-50%,-50%) translateZ(56px);background:linear-gradient(100deg,#10191e,#52666d 48%,#10171b);opacity:.8}
+.plate.p4{width:34%;height:43%;transform:translate(-50%,-50%) translateZ(84px);background:linear-gradient(100deg,#172328,#6a7c82 48%,#10171b);opacity:.55}
+.edge{position:absolute;left:50%;top:50%;width:68%;height:82%;transform:translate(-50%,-50%) translateZ(-18px);clip-path:polygon(25% 3%,75% 3%,91% 18%,88% 85%,72% 98%,28% 98%,12% 85%,9% 18%);background:linear-gradient(90deg,#030608,#0e161b,#030608);opacity:.95}
+.stripe{position:absolute;left:50%;top:50%;width:13%;height:72%;transform:translate(-50%,-50%) translateZ(95px);clip-path:polygon(35% 0,65% 0,88% 100%,12% 100%);background:linear-gradient(90deg,transparent,rgba(141,233,255,.18),transparent);filter:blur(2px)}
+.hot{position:absolute;width:9px;height:9px;border:1px solid var(--cyan);border-radius:50%;background:#071015;box-shadow:0 0 18px rgba(141,233,255,.65);z-index:3;cursor:pointer}.hot.h1{left:43%;top:28%}.hot.h2{left:60%;top:46%}.hot.h3{left:38%;top:61%}.hot.h4{left:56%;top:74%}
+.stage-hud{position:absolute;left:10%;right:10%;bottom:8%;display:flex;justify-content:space-between;font-size:9px;letter-spacing:.18em;color:#78909a}.stage-hud b{color:#cbe8ee}
+.overview{align-self:center;border-left:1px solid var(--line);padding-left:22px}.overview h3{margin:0 0 4px;font-size:12px;letter-spacing:.2em}.overview .sub{font-size:9px;color:var(--muted);letter-spacing:.18em}.meter{margin:22px 0}.meter-head{display:flex;justify-content:space-between;font-size:9px;color:#91a5ad;margin-bottom:7px}.bar{height:3px;background:#162127;border-radius:99px;overflow:hidden}.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--cyan2),var(--cyan));box-shadow:0 0 15px rgba(47,199,232,.55);animation:load 1.2s ease both}.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:24px}.stat{padding:12px;border:1px solid var(--line);border-radius:10px;background:rgba(255,255,255,.015)}.stat small{color:var(--muted);font-size:8px;letter-spacing:.14em}.stat b{display:block;font-size:20px;margin-top:3px}.mode-strip{grid-column:1/-1;display:grid;grid-template-columns:repeat(6,1fr);gap:10px}
+.mode-card{position:relative;overflow:hidden;border:1px solid var(--line);border-radius:12px;background:linear-gradient(145deg,rgba(20,29,34,.82),rgba(7,11,14,.86));padding:15px;cursor:pointer;min-height:120px;transition:.3s}.mode-card:hover{transform:translateY(-5px);border-color:rgba(141,233,255,.45);box-shadow:var(--shadow)}.mode-card .num{font-size:8px;color:var(--cyan);letter-spacing:.18em}.mode-card h4{margin:14px 0 5px;font-size:12px}.mode-card p{margin:0;color:#71838b;font-size:9px;line-height:1.5}.mode-card:after{content:"";position:absolute;width:100px;height:100px;right:-40px;bottom:-50px;border-radius:50%;background:rgba(141,233,255,.05);filter:blur(12px)}
+
+.inner{padding:92px 28px 28px;height:100%;overflow:auto}.inner::-webkit-scrollbar{width:5px}.inner::-webkit-scrollbar-thumb{background:#1b2b31;border-radius:9px}
+.back{display:inline-flex;align-items:center;gap:8px;color:#82959d;font-size:10px;letter-spacing:.16em;border:0;background:none;cursor:pointer;padding:0;margin-bottom:20px}.back:hover{color:var(--cyan)}
+.page-title{font-size:clamp(30px,4vw,58px);letter-spacing:-.045em;margin:0}.page-sub{color:#7d9098;font-size:12px;max-width:650px;line-height:1.65;margin:10px 0 28px}
+.hub-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.game-card{min-height:230px;border:1px solid var(--line);border-radius:16px;padding:18px;position:relative;overflow:hidden;background:linear-gradient(145deg,rgba(18,26,31,.8),rgba(5,9,12,.9));cursor:pointer;transition:.3s}.game-card:hover{transform:translateY(-6px);border-color:rgba(141,233,255,.42);box-shadow:var(--shadow)}.game-art{height:90px;border:1px solid rgba(141,233,255,.1);border-radius:11px;margin-bottom:15px;position:relative;overflow:hidden;background:radial-gradient(circle at 50% 50%,rgba(141,233,255,.11),transparent 45%),linear-gradient(135deg,#0c161b,#060a0d)}.game-art:before{content:"";position:absolute;inset:0;background:linear-gradient(100deg,transparent,rgba(141,233,255,.08),transparent);transform:translateX(-100%);animation:sweep 3.5s infinite}.game-card:hover .game-art:before{animation-duration:1.1s}@keyframes sweep{to{transform:translateX(100%)}}
+.art-ring{position:absolute;left:50%;top:50%;width:58px;height:58px;border:1px solid rgba(141,233,255,.45);border-radius:50%;transform:translate(-50%,-50%);box-shadow:0 0 25px rgba(47,199,232,.12)}.art-ring:after{content:"";position:absolute;inset:10px;border:1px dashed rgba(141,233,255,.3);border-radius:50%;animation:orbit 6s linear infinite}.game-card h3{margin:0 0 5px;font-size:15px}.game-card p{margin:0;color:#74868d;font-size:10px;line-height:1.55}.tag{position:absolute;right:14px;top:14px;color:#89a0a9;font-size:8px;letter-spacing:.15em}.progress{margin-top:17px}.progress .bar{margin-top:6px}
+
+.lab-layout,.range-layout,.physics-layout{display:grid;grid-template-columns:1.35fr .65fr;gap:18px;min-height:calc(100vh - 180px)}.glass{border:1px solid var(--line);border-radius:16px;background:rgba(9,14,18,.72);backdrop-filter:blur(18px);box-shadow:var(--shadow)}.lab-view{position:relative;min-height:500px;display:grid;place-items:center;overflow:hidden}.lab-view:before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 50% 40%,rgba(47,199,232,.09),transparent 36%),linear-gradient(90deg,transparent 49.8%,rgba(141,233,255,.08) 50%,transparent 50.2%),linear-gradient(0deg,transparent 49.8%,rgba(141,233,255,.05) 50%,transparent 50.2%);background-size:auto,100% 100%,100% 100%}.lab-armor{transform:scale(.82);}.zone-list{padding:20px}.zone-list h3{margin:0 0 4px;font-size:13px}.zone-list .muted{font-size:9px;color:var(--muted);letter-spacing:.15em}.zone{margin-top:10px;padding:13px;border:1px solid var(--line);border-radius:11px;background:rgba(255,255,255,.015);cursor:pointer;transition:.25s}.zone:hover,.zone.sel{border-color:rgba(141,233,255,.45);background:rgba(141,233,255,.04)}.zone b{font-size:11px}.zone small{display:block;color:#71838b;font-size:9px;margin-top:4px}.switch{display:flex;justify-content:space-between;align-items:center;margin-top:18px;padding-top:18px;border-top:1px solid var(--line);font-size:10px}.toggle{width:42px;height:22px;border-radius:99px;background:#1a292f;border:1px solid var(--line);padding:2px;cursor:pointer}.toggle i{display:block;width:16px;height:16px;border-radius:50%;background:#71858c;transition:.25s}.toggle.on{background:rgba(47,199,232,.18)}.toggle.on i{transform:translateX(18px);background:var(--cyan);box-shadow:0 0 14px rgba(141,233,255,.6)}
+
+.range-scene{position:relative;min-height:570px;overflow:hidden;background:linear-gradient(180deg,#0b1720 0%,#152a33 43%,#0b1014 44%,#070a0d 100%)}.range-scene:before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 30% 26%,rgba(130,190,205,.18),transparent 25%),linear-gradient(165deg,transparent 60%,rgba(141,233,255,.05) 61%,transparent 62%)}.mountains{position:absolute;left:-10%;right:-10%;top:28%;height:35%;background:linear-gradient(135deg,transparent 18%,#13272f 18% 28%,transparent 28% 38%,#0e2028 38% 50%,transparent 50% 61%,#142b33 61% 73%,transparent 73%);opacity:.8}.range-floor{position:absolute;left:0;right:0;bottom:0;height:48%;background:linear-gradient(170deg,transparent 0 35%,#0b1216 36%),repeating-linear-gradient(90deg,transparent 0 78px,rgba(141,233,255,.06) 79px,transparent 80px)}.mannequin{position:absolute;left:50%;top:54%;transform:translate(-50%,-50%);width:170px;height:300px;filter:drop-shadow(0 35px 20px rgba(0,0,0,.65))}.mannequin .head{position:absolute;left:58px;top:0;width:54px;height:62px;border-radius:42% 42% 45% 45%;background:linear-gradient(120deg,#45555a,#10171b 60%)}.mannequin .torso{position:absolute;left:26px;top:54px;width:118px;height:155px;clip-path:polygon(20% 0,80% 0,98% 20%,88% 100%,12% 100%,2% 20%);background:linear-gradient(100deg,#0e171c,#455860 45%,#111a1f);border:1px solid rgba(141,233,255,.2)}.mannequin .arm{position:absolute;top:68px;width:28px;height:145px;background:linear-gradient(#36484e,#11191d);border-radius:18px}.mannequin .a1{left:5px;transform:rotate(7deg)}.mannequin .a2{right:5px;transform:rotate(-7deg)}.mannequin .leg{position:absolute;top:195px;width:45px;height:105px;background:linear-gradient(90deg,#121a1e,#36484d,#0c1215);border-radius:8px}.mannequin .l1{left:35px}.mannequin .l2{right:35px}.reticle{position:absolute;left:50%;top:53%;width:230px;height:230px;transform:translate(-50%,-50%);border:1px solid rgba(141,233,255,.28);border-radius:50%;box-shadow:0 0 35px rgba(47,199,232,.06)}.reticle:before,.reticle:after{content:"";position:absolute;left:50%;top:50%;background:rgba(141,233,255,.35)}.reticle:before{width:1px;height:100%;transform:translate(-50%,-50%)}.reticle:after{height:1px;width:100%;transform:translate(-50%,-50%)}.scan-dot{position:absolute;left:50%;top:53%;width:8px;height:8px;border:1px solid var(--cyan);border-radius:50%;transform:translate(-50%,-50%);box-shadow:0 0 18px rgba(141,233,255,.7);animation:pulse 1.4s infinite}@keyframes pulse{50%{scale:2;opacity:.45}}
+.range-hud{position:absolute;inset:18px;display:flex;justify-content:space-between;pointer-events:none}.hud-box{width:190px;height:max-content;padding:12px;border:1px solid rgba(141,233,255,.17);background:rgba(5,10,13,.52);backdrop-filter:blur(8px)}.hud-box h4{margin:0 0 10px;font-size:9px;letter-spacing:.18em;color:var(--cyan)}.hud-line{display:flex;justify-content:space-between;font-size:9px;color:#9eb0b6;margin:6px 0}.hud-line b{color:#e5f2f4}.range-controls{position:absolute;left:50%;bottom:16px;transform:translateX(-50%);display:flex;gap:8px}.range-controls button{border:1px solid rgba(141,233,255,.28);background:rgba(5,10,13,.68);padding:10px 14px;border-radius:9px;font-size:9px;letter-spacing:.13em;cursor:pointer}.range-controls button:hover{border-color:var(--cyan);color:var(--cyan)}
+
+.physics-card{padding:20px}.formula{font-size:30px;font-weight:800;letter-spacing:-.04em;margin:8px 0 24px}.slider-row{margin:18px 0}.slider-row label{display:flex;justify-content:space-between;font-size:10px;color:#8da0a8;margin-bottom:8px}.slider-row output{color:var(--cyan);font-weight:800}.slider{width:100%;accent-color:#64dff6}.energy{margin-top:24px;padding:18px;border:1px solid rgba(141,233,255,.18);border-radius:12px;background:rgba(141,233,255,.035)}.energy small{color:var(--muted);font-size:8px;letter-spacing:.14em}.energy strong{display:block;font-size:42px;margin-top:4px}.challenge{padding:20px}.challenge h3{margin:0 0 8px}.answer-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:18px}.ans{padding:13px;border:1px solid var(--line);background:rgba(255,255,255,.015);border-radius:10px;cursor:pointer;text-align:left;font-size:10px}.ans:hover{border-color:rgba(141,233,255,.45)}.ans.good{border-color:rgba(125,242,186,.6);background:rgba(125,242,186,.07)}.ans.bad{border-color:rgba(255,110,117,.5);background:rgba(255,110,117,.06)}
+
+.quiz-card{max-width:880px;margin:0 auto;padding:24px}.quiz-meta{display:flex;justify-content:space-between;color:#80939b;font-size:9px;letter-spacing:.15em}.q{font-size:25px;line-height:1.2;margin:30px 0}.quiz-options{display:grid;grid-template-columns:1fr 1fr;gap:10px}.qopt{padding:17px;border:1px solid var(--line);border-radius:12px;background:rgba(255,255,255,.015);cursor:pointer;text-align:left;transition:.2s}.qopt:hover{border-color:rgba(141,233,255,.45);transform:translateY(-2px)}.qopt span{display:inline-grid;place-items:center;width:25px;height:25px;border:1px solid var(--line);border-radius:7px;margin-right:8px;color:var(--cyan);font-size:9px}.result{margin-top:20px;padding:15px;border-radius:10px;background:rgba(141,233,255,.04);color:#9bb0b7;font-size:10px;display:none}
+
+.assembly{display:grid;grid-template-columns:1fr 300px;gap:18px}.puzzle-wrap{padding:20px}.puzzle{width:min(68vh,520px);aspect-ratio:1;margin:auto;display:grid;grid-template-columns:repeat(3,1fr);gap:5px;padding:5px;background:#101b20;border:1px solid var(--line);border-radius:13px}.tile{border:1px solid rgba(141,233,255,.14);border-radius:6px;background:linear-gradient(135deg,#263a41,#0c1418);display:grid;place-items:center;color:#8fa4ab;font-size:9px;cursor:pointer;position:relative;overflow:hidden}.tile:after{content:"";position:absolute;width:80%;height:1px;background:rgba(141,233,255,.22);transform:rotate(-35deg)}.tile.sel{outline:2px solid var(--cyan);box-shadow:0 0 20px rgba(141,233,255,.15)}.tile.done{background:linear-gradient(135deg,#173b39,#0b1718);color:var(--green)}.side-panel{padding:18px}.score-big{font-size:44px;font-weight:800}.mini-list{margin-top:18px}.mini-list div{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:9px;color:#81939a}
+
+.profile-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.profile-card{padding:22px}.level{font-size:54px;font-weight:850}.badge-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-top:18px}.badge{aspect-ratio:1;border:1px solid var(--line);border-radius:12px;display:grid;place-items:center;text-align:center;padding:8px;background:rgba(255,255,255,.015);font-size:8px;color:#81939a}.badge.unlocked{border-color:rgba(141,233,255,.35);color:var(--cyan);box-shadow:inset 0 0 25px rgba(141,233,255,.04)}.mission{padding:13px;border:1px solid var(--line);border-radius:10px;margin-top:8px}.mission b{font-size:10px}.mission small{display:block;color:#71838b;font-size:8px;margin-top:4px}
+
+.toast{position:fixed;z-index:99;left:50%;bottom:24px;transform:translate(-50%,20px);padding:12px 18px;border:1px solid rgba(141,233,255,.3);background:rgba(6,11,14,.9);backdrop-filter:blur(15px);border-radius:10px;font-size:10px;letter-spacing:.06em;opacity:0;pointer-events:none;transition:.3s}.toast.show{opacity:1;transform:translate(-50%,0)}
+.modal{position:fixed;z-index:80;inset:0;display:none;place-items:center;background:rgba(0,0,0,.58);backdrop-filter:blur(8px)}.modal.open{display:grid}.modal-card{width:min(720px,92vw);padding:26px;border:1px solid rgba(141,233,255,.25);border-radius:17px;background:#0a1014;box-shadow:var(--shadow)}.modal-card h2{margin:0 0 8px}.modal-card p{color:#80939b;line-height:1.7;font-size:11px}.close{float:right;border:0;background:none;color:#81939a;cursor:pointer}
+
+@media(max-width:1000px){
+ .home{grid-template-columns:1fr 1fr;grid-template-rows:auto 1fr 150px}.hero-copy{grid-column:1/-1;align-self:start;padding-top:15px}.hero-copy p{display:none}.hero-stage{min-height:360px}.overview{align-self:center}.mode-strip{grid-column:1/-1;overflow:auto;grid-template-columns:repeat(6,180px)}.hub-grid{grid-template-columns:1fr 1fr}.lab-layout,.range-layout,.physics-layout,.assembly{grid-template-columns:1fr}.profile-grid{grid-template-columns:1fr}
+}
+@media(max-width:650px){
+ .topbar{padding:14px 14px}.brand{font-size:10px}.top-actions .ghost-btn{display:none}.home{padding:72px 14px 14px;display:flex;flex-direction:column;overflow:auto}.hero-copy{flex:none}.hero-copy h1{font-size:47px}.hero-stage{min-height:390px}.overview{display:none}.armor-wrap{width:310px;height:380px}.orbit{width:330px}.mode-strip{display:grid;grid-template-columns:repeat(6,170px);overflow:auto;min-height:130px}.inner{padding:76px 14px 20px}.hub-grid{grid-template-columns:1fr}.quiz-options,.answer-grid{grid-template-columns:1fr}.range-hud{inset:10px}.hud-box{width:145px}.hud-box.right{display:none}.range-scene{min-height:560px}.puzzle{width:min(88vw,430px)}.badge-grid{grid-template-columns:repeat(4,1fr)}
+}
+</style>
+</head>
+<body>
+<div class="app">
+<div class="scanline"></div><div class="noise"></div>
+
+<header class="topbar">
+  <div class="brand">VESTIGE <span>/</span> SCIENCE OF PROTECTION</div>
+  <div class="top-actions">
+    <button class="ghost-btn" onclick="showScreen('hub')">GAMES</button>
+    <button class="ghost-btn" onclick="showScreen('profile')">PROFILE</button>
+    <div class="profile" onclick="showScreen('profile')"><div class="avatar">A</div><div class="ptext"><small>ENGINEER</small><b id="levelLabel">LVL 01 · 0 XP</b></div></div>
+  </div>
+</header>
+
+<section id="home" class="screen active">
+  <div class="home">
+    <div class="hero-copy">
+      <div class="eyebrow">ADVANCED TRAINING SYSTEM · 01</div>
+      <h1>PROTECTION,<br>ENGINEERED.</h1>
+      <p>Интерактивная лаборатория, где физика, материалы, инженерное мышление и игровые испытания соединяются в одну систему.</p>
+      <button class="play" onclick="showScreen('hub')">▶ PLAY / ENTER SYSTEM</button>
+    </div>
+
+    <div class="hero-stage">
+      <div class="orbit"></div>
+      <div class="armor-wrap" id="armorWrap">
+        <div class="armor3d" id="armor3d">
+          <div class="edge"></div><div class="plate"></div><div class="plate p2"></div><div class="plate p3"></div><div class="plate p4"></div><div class="stripe"></div>
+          <button class="hot h1" onclick="openZone('CORE')"></button><button class="hot h2" onclick="openZone('CHEST')"></button><button class="hot h3" onclick="openZone('LOWER')"></button><button class="hot h4" onclick="openZone('STRUCTURE')"></button>
+        </div>
+      </div>
+      <div class="stage-hud"><span>DRAG <b>ROTATE</b></span><span>SCROLL <b>ZOOM</b></span><span>STATUS <b>ONLINE</b></span></div>
+    </div>
+
+    <aside class="overview">
+      <h3>ARMOR OVERVIEW</h3><div class="sub">VSTG / CONCEPT SYSTEM</div>
+      <div class="meter"><div class="meter-head"><span>STRUCTURAL INTEGRITY</span><b>98%</b></div><div class="bar"><i style="width:98%"></i></div></div>
+      <div class="meter"><div class="meter-head"><span>ENERGY RESPONSE</span><b>91%</b></div><div class="bar"><i style="width:91%"></i></div></div>
+      <div class="meter"><div class="meter-head"><span>ANALYSIS READY</span><b>100%</b></div><div class="bar"><i style="width:100%"></i></div></div>
+      <div class="stat-grid"><div class="stat"><small>MODULES</small><b>06</b></div><div class="stat"><small>MISSIONS</small><b id="missionCount">12</b></div><div class="stat"><small>XP</small><b id="xpSmall">0</b></div><div class="stat"><small>RANK</small><b id="rankSmall">R0</b></div></div>
+    </aside>
+
+    <div class="mode-strip">
+      <div class="mode-card" onclick="showScreen('lab')"><div class="num">01 / LAB</div><h4>ARMOR LAB</h4><p>Разборка системы и интерактивные зоны.</p></div>
+      <div class="mode-card" onclick="showScreen('assembly')"><div class="num">02 / BUILD</div><h4>ASSEMBLY</h4><p>Собери архитектуру по логике.</p></div>
+      <div class="mode-card" onclick="showScreen('range')"><div class="num">03 / RANGE</div><h4>TEST RANGE</h4><p>Безопасный симулятор анализа манекена.</p></div>
+      <div class="mode-card" onclick="showScreen('materials')"><div class="num">04 / DATA</div><h4>MATERIALS</h4><p>Сравни свойства и инженерные компромиссы.</p></div>
+      <div class="mode-card" onclick="showScreen('physics')"><div class="num">05 / PHYSICS</div><h4>PHYSICS ENGINE</h4><p>Формулы превращаются в механику.</p></div>
+      <div class="mode-card" onclick="showScreen('quiz')"><div class="num">06 / MIND</div><h4>QUIZ</h4><p>Разные типы задач, случайные раунды.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="hub" class="screen"><div class="inner">
+<button class="back" onclick="showScreen('home')">← SYSTEM HOME</button>
+<h2 class="page-title">GAME HUB</h2><p class="page-sub">Шесть разных механик. Никаких повторяющихся вопросов: задания, порядок вариантов и события меняются от запуска к запуску.</p>
+<div class="hub-grid">
+<div class="game-card" onclick="showScreen('lab')"><span class="tag">FREE</span><div class="game-art"><div class="art-ring"></div></div><h3>ARMOR LAB</h3><p>Исследуй зоны, включай X-RAY и собирай профиль системы.</p><div class="progress"><div class="bar"><i style="width:74%"></i></div></div></div>
+<div class="game-card" onclick="showScreen('assembly')"><span class="tag">SKILL</span><div class="game-art"><div class="art-ring" style="border-radius:8px;rotate:45deg"></div></div><h3>ASSEMBLY</h3><p>Логическая сборка: переставляй элементы и уложись в лимит.</p><div class="progress"><div class="bar"><i style="width:41%"></i></div></div></div>
+<div class="game-card" onclick="showScreen('range')"><span class="tag">SIM</span><div class="game-art"><div class="art-ring" style="border-radius:8px;width:80px;height:50px"></div></div><h3>TEST RANGE</h3><p>Сканируй учебный манекен и анализируй зоны воздействия.</p><div class="progress"><div class="bar"><i style="width:62%"></i></div></div></div>
+<div class="game-card" onclick="showScreen('materials')"><span class="tag">DATA</span><div class="game-art"><div class="art-ring" style="width:85px;height:32px;border-radius:50%"></div></div><h3>MATERIALS</h3><p>Сравни массу, жёсткость, энергоёмкость и компромиссы.</p><div class="progress"><div class="bar"><i style="width:33%"></i></div></div></div>
+<div class="game-card" onclick="showScreen('physics')"><span class="tag">ENGINE</span><div class="game-art"><div class="art-ring" style="border:0;border-top:1px solid var(--cyan);rotate:25deg"></div></div><h3>PHYSICS ENGINE</h3><p>Интерактивные переменные, графики и быстрые расчётные челленджи.</p><div class="progress"><div class="bar"><i style="width:58%"></i></div></div></div>
+<div class="game-card" onclick="showScreen('quiz')"><span class="tag">MIND</span><div class="game-art"><div class="art-ring" style="width:45px;height:45px;border-style:dashed"></div></div><h3>QUIZ / MISSION</h3><p>Серия случайных испытаний с комбо, точностью и XP.</p><div class="progress"><div class="bar"><i style="width:19%"></i></div></div></div>
+</div></div></section>
+
+<section id="lab" class="screen"><div class="inner">
+<button class="back" onclick="showScreen('hub')">← GAME HUB</button>
+<h2 class="page-title">ARMOR LAB</h2><p class="page-sub">Интерактивная карта концептуальной системы. Нажми на зону или перетащи модель. X-RAY показывает абстрактные внутренние слои.</p>
+<div class="lab-layout"><div class="glass lab-view"><div class="armor-wrap lab-armor"><div class="armor3d" id="labArmor"><div class="edge"></div><div class="plate"></div><div class="plate p2"></div><div class="plate p3"></div><div class="plate p4"></div><div class="stripe"></div><button class="hot h1" onclick="selectZone('CORE')"></button><button class="hot h2" onclick="selectZone('CHEST')"></button><button class="hot h3" onclick="selectZone('LOWER')"></button><button class="hot h4" onclick="selectZone('STRUCTURE')"></button></div></div></div>
+<div class="glass zone-list"><h3 id="zoneTitle">CORE LAYER</h3><div class="muted" id="zoneSub">PRIMARY PROTECTIVE ZONE</div><p id="zoneDesc" style="color:#879aa2;font-size:10px;line-height:1.65">Выбери точку на модели, чтобы открыть профиль. Данные в игре учебные и концептуальные.</p>
+<div class="zone sel" onclick="selectZone('CORE')"><b>CORE</b><small>центральный слой</small></div><div class="zone" onclick="selectZone('CHEST')"><b>CHEST</b><small>основная зона</small></div><div class="zone" onclick="selectZone('LOWER')"><b>LOWER</b><small>нижняя геометрия</small></div><div class="zone" onclick="selectZone('STRUCTURE')"><b>STRUCTURE</b><small>связи и каркас</small></div>
+<div class="switch"><span>X-RAY CONCEPT VIEW</span><button class="toggle" id="xray" onclick="toggleXray()"><i></i></button></div>
+</div></div></div></section>
+
+<section id="assembly" class="screen"><div class="inner">
+<button class="back" onclick="showScreen('hub')">← GAME HUB</button><h2 class="page-title">ASSEMBLY</h2><p class="page-sub">Собери абстрактную архитектуру по логике. Нажми две плитки, чтобы поменять их местами. Новый раунд перемешивает поле.</p>
+<div class="assembly"><div class="glass puzzle-wrap"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><div><b>SEQUENCE A-07</b><div style="font-size:8px;color:#71838b;margin-top:4px">LOGIC / STRUCTURE / ORDER</div></div><button class="ghost-btn" onclick="newPuzzle()">NEW RUN</button></div><div class="puzzle" id="puzzle"></div></div><div class="glass side-panel"><div style="font-size:9px;color:var(--cyan);letter-spacing:.15em">RUN SCORE</div><div class="score-big" id="pScore">0</div><div class="mini-list"><div><span>MOVES</span><b id="moves">0</b></div><div><span>TIME</span><b id="pTime">60</b></div><div><span>BEST</span><b id="pBest">0</b></div><div><span>STATUS</span><b id="pStatus">READY</b></div></div><button class="play" style="width:100%;margin-top:20px" onclick="newPuzzle()">RESET / START</button></div></div>
+</div></section>
+
+<section id="range" class="screen"><div class="inner">
+<button class="back" onclick="showScreen('hub')">← GAME HUB</button><h2 class="page-title">TEST RANGE</h2><p class="page-sub">Учебный симулятор: вместо реального оружия — абстрактное воздействие, сканирование и анализ манекена.</p>
+<div class="range-layout"><div class="glass range-scene"><div class="mountains"></div><div class="range-floor"></div><div class="mannequin"><div class="head"></div><div class="torso"></div><div class="arm a1"></div><div class="arm a2"></div><div class="leg l1"></div><div class="leg l2"></div></div><div class="reticle"></div><div class="scan-dot"></div>
+<div class="range-hud"><div class="hud-box"><h4>SCAN / MANNEQUIN</h4><div class="hud-line"><span>ZONE</span><b id="scanZone">CHEST</b></div><div class="hud-line"><span>INTEGRITY</span><b id="integrity">100%</b></div><div class="hud-line"><span>RESPONSE</span><b id="response">STABLE</b></div></div><div class="hud-box right"><h4>ANALYSIS</h4><div class="hud-line"><span>MODE</span><b>EDUCATIONAL</b></div><div class="hud-line"><span>DATA</span><b id="scanData">READY</b></div><div class="hud-line"><span>SCORE</span><b id="rangeScore">0</b></div></div></div>
+<div class="range-controls"><button onclick="scanEvent()">◉ SCAN ZONE</button><button onclick="impactEvent()">△ SIMULATE EVENT</button><button onclick="resetRange()">↻ RESET</button></div></div>
+<div class="glass challenge"><h3>ANALYSIS CHALLENGE</h3><p style="font-size:10px;color:#7f929a;line-height:1.6">Определи, какая величина лучше описывает изменение состояния системы в текущем сценарии.</p><div class="answer-grid"><button class="ans" onclick="rangeAnswer(this,true)">ENERGY TRANSFER</button><button class="ans" onclick="rangeAnswer(this,false)">COLOR ONLY</button><button class="ans" onclick="rangeAnswer(this,true)">STRUCTURAL RESPONSE</button><button class="ans" onclick="rangeAnswer(this,false)">RANDOM NUMBER</button></div><div id="rangeHint" style="margin-top:16px;font-size:9px;color:#78909a"></div></div></div></div></section>
+
+<section id="materials" class="screen"><div class="inner">
+<button class="back" onclick="showScreen('hub')">← GAME HUB</button><h2 class="page-title">MATERIALS DATABASE</h2><p class="page-sub">Сравни концептуальные свойства. Это учебная модель: она показывает компромиссы, а не реальные спецификации.</p>
+<div class="hub-grid" id="materialsGrid"></div></div></section>
+
+<section id="physics" class="screen"><div class="inner">
+<button class="back" onclick="showScreen('hub')">← GAME HUB</button><h2 class="page-title">PHYSICS ENGINE</h2><p class="page-sub">Меняй параметры и наблюдай, как меняется энергия. Ниже — мини-челлендж с разными формулами.</p>
+<div class="physics-layout"><div class="glass physics-card"><div class="eyebrow">KINEMATICS / ENERGY</div><div class="formula">E = ½mv²</div>
+<div class="slider-row"><label><span>MASS</span><output id="mOut">8 kg</output></label><input id="mass" class="slider" type="range" min="1" max="30" value="8"></div>
+<div class="slider-row"><label><span>VELOCITY</span><output id="vOut">12 m/s</output></label><input id="vel" class="slider" type="range" min="1" max="40" value="12"></div>
+<div class="energy"><small>CALCULATED KINETIC ENERGY</small><strong id="energy">576 J</strong><div class="bar" style="margin-top:12px"><i id="energyBar" style="width:28%"></i></div></div>
+<div style="margin-top:22px;display:flex;gap:8px"><button class="ghost-btn" onclick="randomPhysics()">RANDOMIZE</button><button class="ghost-btn" onclick="physicsChallenge()">CHALLENGE</button></div></div>
+<div class="glass challenge"><div class="eyebrow">FORMULA REPAIR</div><h3 id="pcQ">Если E и m известны, какую величину нужно найти, чтобы восстановить v?</h3><div class="answer-grid" id="pcAnswers"></div><div id="pcResult" class="result"></div></div></div>
+</div></section>
+
+<section id="quiz" class="screen"><div class="inner">
+<button class="back" onclick="showScreen('hub')">← GAME HUB</button><div class="quiz-card glass"><div class="quiz-meta"><span id="qProgress">ROUND 01 / 08</span><span id="qScore">0 XP</span></div><div class="q" id="question">Загрузка...</div><div class="quiz-options" id="quizOptions"></div><div class="result" id="quizResult"></div><button class="play" id="nextQ" style="display:none" onclick="nextQuestion()">NEXT →</button></div></div></section>
+
+<section id="profile" class="screen"><div class="inner">
+<button class="back" onclick="showScreen('home')">← SYSTEM HOME</button><h2 class="page-title">ENGINEER PROFILE</h2><p class="page-sub">Твоя статистика, XP и достижения сохраняются в браузере.</p>
+<div class="profile-grid"><div class="glass profile-card"><div class="eyebrow">CURRENT LEVEL</div><div class="level" id="profileLevel">01</div><div style="color:#7e929a;font-size:10px" id="profileXP">0 / 500 XP</div><div class="bar" style="margin-top:12px"><i id="profileBar" style="width:0%"></i></div><div class="badge-grid" id="badges"></div></div>
+<div class="glass profile-card"><div class="eyebrow">MISSIONS / RECORDS</div><div class="mission"><b>FIRST SCAN</b><small id="m1">LOCKED</small></div><div class="mission"><b>LAB RAT</b><small id="m2">LOCKED</small></div><div class="mission"><b>PHYSICS MIND</b><small id="m3">LOCKED</small></div><div class="mission"><b>ASSEMBLY ACE</b><small id="m4">LOCKED</small></div><div class="mission"><b>RANGE ANALYST</b><small id="m5">LOCKED</small></div><div class="mission"><b>QUIZ MASTER</b><small id="m6">LOCKED</small></div><button class="ghost-btn" style="margin-top:15px" onclick="resetProgress()">RESET LOCAL PROGRESS</button></div></div>
+</div></section>
+
+<div class="modal" id="modal"><div class="modal-card"><button class="close" onclick="closeModal()">✕</button><h2 id="modalTitle">ZONE</h2><p id="modalText"></p></div></div>
+<div class="toast" id="toast"></div>
+</div>
+
+<script>
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const state=JSON.parse(localStorage.getItem('vestige_state')||'null')||{xp:0,scans:0,range:0,quiz:0,assembly:0,lab:0,ach:{}};
+function save(){localStorage.setItem('vestige_state',JSON.stringify(state));updateUI()}
+function level(){return Math.floor(state.xp/500)+1}
+function rank(){return 'R'+Math.floor((level()-1)/3)}
+function addXP(n,reason=''){state.xp+=n;if(reason)toast('+'+n+' XP · '+reason);save()}
+function updateUI(){
+ let l=level(),x=state.xp%500;
+ $('#levelLabel').textContent=`LVL ${String(l).padStart(2,'0')} · ${state.xp} XP`;
+ $('#xpSmall').textContent=state.xp; $('#rankSmall').textContent=rank();
+ $('#profileLevel').textContent=String(l).padStart(2,'0');$('#profileXP').textContent=`${x} / 500 XP`;$('#profileBar').style.width=(x/5)+'%';
+ const ach=[['m1','FIRST SCAN',state.scans>0],['m2','LAB RAT',state.lab>=3],['m3','PHYSICS MIND',state.xp>=300],['m4','ASSEMBLY ACE',state.assembly>=2],['m5','RANGE ANALYST',state.range>=3],['m6','QUIZ MASTER',state.quiz>=5]];
+ ach.forEach(([id,n,on])=>{$('#'+id).textContent=on?'UNLOCKED':'LOCKED';});
+ const bg=$('#badges'); if(bg){bg.innerHTML=ach.map(([id,n,on])=>`<div class="badge ${on?'unlocked':''}">${on?'◆':'◇'}<br>${n}</div>`).join('')}
+}
+function toast(t){const e=$('#toast');e.textContent=t;e.classList.add('show');clearTimeout(window._toast);window._toast=setTimeout(()=>e.classList.remove('show'),2200)}
+function showScreen(id){
+ $$('.screen').forEach(x=>x.classList.remove('active'));$('#'+id).classList.add('active');
+ if(id==='quiz')startQuiz(); if(id==='assembly'&&!window.puzzleStarted)newPuzzle(); if(id==='materials')renderMaterials();
+ updateUI();
+}
+function openZone(z){const data={CORE:['CORE LAYER','PRIMARY PROTECTIVE ZONE','Центральная концептуальная зона. Здесь игра показывает распределение слоёв и реакцию системы как абстрактную инженерную модель.'],CHEST:['CHEST ZONE','PRIMARY RESPONSE','Основная зона модели. Состояние отображается через условные показатели, без реальных спецификаций.'],LOWER:['LOWER GEOMETRY','BALANCE / FORM','Нижняя часть отвечает за визуальную геометрию, баланс и распределение формы в учебной модели.'],STRUCTURE:['STRUCTURE','FRAME / CONNECTIONS','Концептуальные связи между элементами. Здесь важно понять, что изменение одной части влияет на всю систему.']};let d=data[z]||data.CORE;$('#modalTitle').textContent=d[0];$('#modalText').textContent=d[2];$('#modal').classList.add('open');state.lab++;save()}
+function closeModal(){$('#modal').classList.remove('open')}
+function selectZone(z){$$('.zone').forEach(e=>e.classList.remove('sel'));const el=$$('.zone').find(e=>e.innerText.includes(z));if(el)el.classList.add('sel');const m={CORE:['CORE LAYER','PRIMARY PROTECTIVE ZONE'],CHEST:['CHEST ZONE','PRIMARY RESPONSE'],LOWER:['LOWER GEOMETRY','BALANCE / FORM'],STRUCTURE:['STRUCTURE','FRAME / CONNECTIONS']}[z];$('#zoneTitle').textContent=m[0];$('#zoneSub').textContent=m[1];$('#zoneDesc').textContent='Зона выбрана. Наблюдай за изменением профиля и включай X-RAY для абстрактного внутреннего вида.'}
+function toggleXray(){const b=$('#xray');b.classList.toggle('on');const on=b.classList.contains('on');$('#labArmor').style.filter=on?'brightness(1.2) saturate(.55) drop-shadow(0 0 28px rgba(141,233,255,.25))':'';toast(on?'X-RAY CONCEPT ON':'X-RAY CONCEPT OFF')}
+
+let rx=0,ry=0,zoom=1,drag=false,lastX=0,lastY=0;
+function applyArmor(){const t=`rotateX(${rx}deg) rotateY(${ry}deg) scale(${zoom})`;$('#armor3d').style.transform=t}
+const aw=$('#armorWrap');
+aw.addEventListener('pointerdown',e=>{drag=true;lastX=e.clientX;lastY=e.clientY;aw.setPointerCapture(e.pointerId)});
+aw.addEventListener('pointermove',e=>{if(!drag)return;ry+=(e.clientX-lastX)*.45;rx-=(e.clientY-lastY)*.25;rx=Math.max(-28,Math.min(28,rx));lastX=e.clientX;lastY=e.clientY;applyArmor()});
+aw.addEventListener('pointerup',()=>drag=false);aw.addEventListener('pointercancel',()=>drag=false);
+aw.addEventListener('wheel',e=>{e.preventDefault();zoom=Math.max(.72,Math.min(1.45,zoom-e.deltaY*.0008));applyArmor()},{passive:false});
+let idle=0;setInterval(()=>{if(!drag){idle+=.25;ry+=.045;applyArmor()}},40);
+
+const materials=[
+['CERAMIC CONCEPT','HIGH STIFFNESS','LOWER MASS','Fast response / brittle trade-off','86'],
+['FIBER MATRIX','FLEXIBLE','ENERGY MANAGEMENT','Layered response / balanced concept','78'],
+['METAL ALLOY','HIGH DURABILITY','HIGHER MASS','Robustness / mass trade-off','72'],
+['HYBRID SYSTEM','BALANCED','TUNABLE','Multiple properties / complexity','91']
+];
+function renderMaterials(){$('#materialsGrid').innerHTML=materials.map((m,i)=>`<div class="game-card" onclick="materialInfo(${i})"><span class="tag">DATA ${String(i+1).padStart(2,'0')}</span><div class="game-art"><div class="art-ring" style="width:${60+i*15}px;height:${60-i*8}px"></div></div><h3>${m[0]}</h3><p><b>${m[1]}</b> · ${m[2]}<br>${m[3]}</p><div class="progress"><div class="bar"><i style="width:${m[4]}%"></i></div></div></div>`).join('')}
+function materialInfo(i){openZone(materials[i][0])}
+
+let selectedZone='CHEST', integrity=100, rangeScore=0;
+function scanEvent(){const zones=['CHEST','CORE','LOWER','STRUCTURE'];selectedZone=zones[Math.floor(Math.random()*zones.length)];$('#scanZone').textContent=selectedZone;$('#scanData').textContent='ANALYZING';setTimeout(()=>{$('#scanData').textContent='PROFILE READY';$('#response').textContent='STABLE';},600);state.scans++;addXP(20,'SCAN COMPLETE')}
+function impactEvent(){integrity=Math.max(42,integrity-Math.floor(5+Math.random()*18));rangeScore+=10;$('#integrity').textContent=integrity+'%';$('#rangeScore').textContent=rangeScore;$('#response').textContent=integrity<60?'ATTENTION':'STABLE';$('#scanData').textContent='EVENT LOGGED';state.range++;addXP(10,'RANGE DATA')}
+function resetRange(){integrity=100;rangeScore=0;$('#integrity').textContent='100%';$('#rangeScore').textContent='0';$('#response').textContent='STABLE';$('#scanData').textContent='READY'}
+function rangeAnswer(el,good){$$('.ans').forEach(x=>x.classList.remove('good','bad'));el.classList.add(good?'good':'bad');$('#rangeHint').textContent=good?'Correct: это связано с физическим состоянием системы.':'Нет: это не описывает физический процесс.';if(good)addXP(15,'RANGE ANALYSIS')}
+
+let m=8,v=12;
+function updatePhysics(){m=+$(' #mass'.trim()).value;v=+$(' #vel'.trim()).value;$('#mOut').textContent=m+' kg';$('#vOut').textContent=v+' m/s';const E=.5*m*v*v;$('#energy').textContent=Math.round(E)+' J';$('#energyBar').style.width=Math.min(100,E/24)+'%'}
+$('#mass').addEventListener('input',updatePhysics);$('#vel').addEventListener('input',updatePhysics);
+function randomPhysics(){$('#mass').value=1+Math.floor(Math.random()*30);$('#vel').value=1+Math.floor(Math.random()*40);updatePhysics();toast('PARAMETERS RANDOMIZED')}
+function physicsChallenge(){const q=[['Если E и m известны, что нужно восстановить?',['v','m','t','F'],0],['Какая величина растёт квадратично с v в E = ½mv²?',['E','m','v','t'],0],['Что произойдёт с E, если v удвоить при том же m?',['Увеличится в 2 раза','В 4 раза','Не изменится','Уменьшится'],1]][Math.floor(Math.random()*3)];$('#pcQ').textContent=q[0];$('#pcAnswers').innerHTML=q[1].map((x,i)=>`<button class="ans" onclick="pcAnswer(this,${i===q[2]})">${x}</button>`).join('');$('#pcResult').style.display='none'}
+function pcAnswer(el,good){$$('#pcAnswers .ans').forEach(x=>x.classList.remove('good','bad'));el.classList.add(good?'good':'bad');$('#pcResult').style.display='block';$('#pcResult').textContent=good?'Верно. +20 XP':'Почти. Проверь связь переменных и степень скорости.';if(good)addXP(20,'PHYSICS CHALLENGE')}
+physicsChallenge();
+
+let tiles=[],picked=null,moves=0,pTimer=null,pSeconds=60;
+function newPuzzle(){window.puzzleStarted=true;moves=0;pSeconds=60;tiles=[0,1,2,3,4,5,6,7,8].sort(()=>Math.random()-.5);renderPuzzle();clearInterval(pTimer);pTimer=setInterval(()=>{pSeconds--;$('#pTime').textContent=pSeconds;if(pSeconds<=0){clearInterval(pTimer);$('#pStatus').textContent='TIME';toast('RUN COMPLETE');}},1000);$('#pStatus').textContent='LIVE'}
+function renderPuzzle(){$('#puzzle').innerHTML=tiles.map((n,i)=>`<button class="tile ${n===i?'done':''} ${picked===i?'sel':''}" onclick="pickTile(${i})">${String(n+1).padStart(2,'0')}</button>`).join('');$('#moves').textContent=moves;$('#pScore').textContent=Math.max(0,900-moves*35+pSeconds*4)}
+function pickTile(i){if(picked===null){picked=i;renderPuzzle();return}if(picked===i){picked=null;renderPuzzle();return}[tiles[picked],tiles[i]]=[tiles[i],tiles[picked]];moves++;picked=null;renderPuzzle();if(tiles.every((n,i)=>n===i)){clearInterval(pTimer);state.assembly++;addXP(100,'ASSEMBLY COMPLETE');$('#pStatus').textContent='COMPLETE';toast('ASSEMBLY COMPLETE · +100 XP')}}
+
+const questions=[
+['Какая величина в СИ измеряет энергию?',['Джоуль','Ньютон','Паскаль','Ватт'],0],
+['Если массу увеличить при той же скорости, кинетическая энергия…',['увеличится','уменьшится','не изменится','станет нулевой'],0],
+['В формуле E = ½mv² скорость находится…',['в первой степени','во второй степени','в третьей степени','не используется'],1],
+['Что такое инерция?',['Свойство сохранять состояние движения','Мера температуры','Единица энергии','Вид материала'],0],
+['Какой график линейный для E при постоянной v?',['E от m','E от v','E от v²','ни один'],0],
+['Что происходит с энергией при v → 2v?',['×2','×3','×4','÷2'],2],
+['Какая величина характеризует способность системы поглощать энергию в модели?',['Энергопоглощение','Цвет','Шрифт','Номер уровня'],0],
+['Почему инженерные системы имеют компромиссы?',['Потому что свойства связаны','Потому что числа случайны','Потому что формулы не нужны','Только из-за дизайна'],0],
+['Что нужно сделать первым при решении формулы?',['Определить известные и неизвестные','Сразу округлить','Угадать ответ','Игнорировать единицы'],0],
+['Какая единица у скорости?',['м/с','кг','Дж','Н'],0],
+['Какая единица у массы?',['кг','м/с','Дж','Вт'],0],
+['Что лучше описывает учебный симулятор?',['Модель для понимания явлений','Реальная спецификация','Гарантия результата','Инструкция по применению'],0],
+['При увеличении массы в E = ½mv² при постоянной v энергия…',['растёт линейно','растёт квадратично','не меняется','падает'],0],
+['Какой элемент помогает читать изменение состояния системы?',['График/метрика','Случайная кнопка','Фон','Аватар'],0],
+['Что такое переменная?',['Величина, которая может изменяться','Только ответ','Название игры','Единица измерения'],0]
+];
+let quizSet=[],qi=0,qscore=0;
+function startQuiz(){quizSet=[...questions].sort(()=>Math.random()-.5).slice(0,8).map(q=>({...q,opts:q[1].map((x,i)=>({x,i})).sort(()=>Math.random()-.5)}));qi=0;qscore=0;renderQ()}
+function renderQ(){const q=quizSet[qi];$('#qProgress').textContent=`ROUND ${String(qi+1).padStart(2,'0')} / ${quizSet.length}`;$('#qScore').textContent=qscore+' XP';$('#question').textContent=q[0];$('#quizResult').style.display='none';$('#nextQ').style.display='none';$('#quizOptions').innerHTML=q.opts.map((o,i)=>`<button class="qopt" onclick="answerQ(this,${o.i===q[2]})"><span>${String.fromCharCode(65+i)}</span>${o.x}</button>`).join('')}
+function answerQ(el,good){$$('.qopt').forEach(x=>x.disabled=true);el.style.borderColor=good?'rgba(125,242,186,.65)':'rgba(255,110,117,.6)';$('#quizResult').style.display='block';$('#quizResult').textContent=good?'CORRECT · +25 XP':'NOT QUITE · следующий раунд уже другой';if(good){qscore+=25;addXP(25,'QUIZ')}if(qi===quizSet.length-1){state.quiz++;addXP(50,'MISSION COMPLETE');$('#nextQ').textContent='FINISH';}else $('#nextQ').textContent='NEXT →';$('#nextQ').style.display='inline-block'}
+function nextQuestion(){if(qi===quizSet.length-1){toast('MISSION COMPLETE');showScreen('profile');return}qi++;renderQ()}
+
+function resetProgress(){if(confirm('Сбросить локальный прогресс?')){localStorage.removeItem('vestige_state');location.reload()}}
+
+updateUI();newPuzzle();updatePhysics();
+</script>
+</body>
+</html>

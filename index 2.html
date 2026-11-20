@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Physics Game — Ю-2.26</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#08111f;color:#eef6ff;min-height:100vh}
+button{font:inherit;cursor:pointer;border:0}.app{max-width:1100px;margin:auto;padding:18px}
+header{display:flex;justify-content:space-between;align-items:center;padding:16px 18px;background:#101d31;border:1px solid #223653;border-radius:20px;position:sticky;top:10px;z-index:5}
+.logo{font-size:22px;font-weight:800}.sub{color:#8fa8c5;font-size:12px;margin-top:3px}
+.stats{display:flex;gap:8px;align-items:center}.pill{background:#172942;border:1px solid #29405f;border-radius:999px;padding:8px 12px;font-size:13px}
+main{padding:28px 0}.screen{display:none}.screen.active{display:block}
+.hero{background:linear-gradient(145deg,#132844,#0e1929);border:1px solid #29415f;border-radius:28px;padding:34px;text-align:center;margin-bottom:20px}
+.hero h1{font-size:42px;margin:0 0 10px}.hero p{color:#a9bdd5;max-width:680px;margin:0 auto 22px;line-height:1.5}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px}
+.card{background:#101d31;border:1px solid #243b59;border-radius:20px;padding:20px;transition:.15s}.card:hover{transform:translateY(-2px);border-color:#4774a8}
+.card h3{margin:8px 0}.card p{color:#8fa8c5;font-size:14px;line-height:1.4}.icon{font-size:30px}
+.btn{background:#2f80ed;color:white;border-radius:13px;padding:12px 18px;font-weight:700}.btn.secondary{background:#172942;border:1px solid #29405f}.btn.good{background:#168a57}.btn.warn{background:#a86b16}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}.title{font-size:30px;margin:0 0 8px}.muted{color:#8fa8c5}.question{font-size:24px;line-height:1.35;margin:25px 0}
+.answers{display:grid;gap:10px}.answers button{background:#172942;color:#eef6ff;border:1px solid #2b4566;padding:14px;border-radius:13px;text-align:left}.answers button:hover{background:#203755}
+.feedback{min-height:28px;margin-top:15px;font-weight:700}.hidden{display:none!important}
+.back{margin-bottom:15px}.profile{display:flex;gap:20px;align-items:center}.avatar{width:110px;height:110px;border-radius:50%;background:#172942;border:2px dashed #52749b;display:flex;align-items:center;justify-content:center;font-size:42px;overflow:hidden}.avatar img{width:100%;height:100%;object-fit:cover}
+input,select{width:100%;padding:12px;border-radius:12px;border:1px solid #29405f;background:#0b1727;color:white;margin:6px 0 12px}
+.formula{font-size:25px;background:#0b1727;padding:18px;border-radius:15px;margin:10px 0}.result{font-size:18px;margin-top:8px}
+.smallgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.badge{padding:12px;background:#172942;border:1px solid #29405f;border-radius:14px}.locked{opacity:.45}
+footer{text-align:center;color:#7187a2;padding:25px;font-size:12px}
+@media(max-width:600px){.hero h1{font-size:32px}.hero{padding:25px 18px}.stats .pill:nth-child(2){display:none}.app{padding:10px}.question{font-size:20px}}
+</style>
+</head>
+<body>
+<div class="app">
+<header>
+  <div><div class="logo">⚛️ PHYSICS GAME</div><div class="sub">Учебная игра по физике • Ю-2.26</div></div>
+  <div class="stats"><div class="pill">⭐ <span id="xp">0</span> XP</div><div class="pill">🏆 Ур. <span id="level">1</span></div></div>
+</header>
+
+<main>
+<section id="home" class="screen active">
+  <div class="hero">
+    <h1>Физика — это игра ⚡</h1>
+    <p>Изучай физику через задачи, мини-игры, загадки, кроссворды и эксперименты. Твой прогресс сохраняется прямо в браузере.</p>
+    <div class="actions" style="justify-content:center">
+      <button class="btn" onclick="show('games')">🎮 Играть</button>
+      <button class="btn secondary" onclick="show('learn')">📚 Учиться</button>
+      <button class="btn secondary" onclick="show('author')">👤 Автор</button>
+    </div>
+  </div>
+  <div class="grid">
+    <div class="card"><div class="icon">🚀</div><h3>Кинематика</h3><p>Скорость, путь, время и движение.</p><button class="btn" onclick="startQuiz('kin')">Играть</button></div>
+    <div class="card"><div class="icon">🏆</div><h3>Прогресс</h3><p><span id="progressText">0</span> XP заработано.</p><button class="btn secondary" onclick="show('achievements')">Достижения</button></div>
+    <div class="card"><div class="icon">🧮</div><h3>Калькулятор</h3><p>Быстро рассчитывай физические величины.</p><button class="btn secondary" onclick="show('calculator')">Открыть</button></div>
+  </div>
+</section>
+
+<section id="games" class="screen">
+<button class="btn secondary back" onclick="show('home')">← Главное меню</button>
+<h2 class="title">🎮 Игры и режимы</h2><p class="muted">Выбирай любой режим.</p>
+<div class="grid">
+<div class="card"><div class="icon">🚀</div><h3>Кинематика</h3><p>Решай задачи про движение.</p><button class="btn" onclick="startQuiz('kin')">Играть</button></div>
+<div class="card"><div class="icon">🧠</div><h3>Викторина</h3><p>Физические вопросы с вариантами ответа.</p><button class="btn" onclick="startQuiz('quiz')">Играть</button></div>
+<div class="card"><div class="icon">🕵️</div><h3>Загадки</h3><p>Угадай физическое явление или величину.</p><button class="btn" onclick="startQuiz('riddle')">Играть</button></div>
+<div class="card"><div class="icon">⚡</div><h3>Верно / Неверно</h3><p>Проверяй физические утверждения.</p><button class="btn" onclick="startQuiz('tf')">Играть</button></div>
+<div class="card"><div class="icon">🧩</div><h3>Пазлы</h3><p>Собери физическую схему.</p><button class="btn" onclick="puzzle()">Играть</button></div>
+<div class="card"><div class="icon">🧩</div><h3>Кроссворд</h3><p>Разгадывай физические термины.</p><button class="btn" onclick="crossword()">Играть</button></div>
+<div class="card"><div class="icon">🔗</div><h3>Соедини пары</h3><p>Соедини величину с единицей.</p><button class="btn" onclick="pairs()">Играть</button></div>
+<div class="card"><div class="icon">🎯</div><h3>Попади в цель</h3><p>Рассчитай параметры броска.</p><button class="btn" onclick="startQuiz('target')">Играть</button></div>
+<div class="card"><div class="icon">🏎️</div><h3>Физическая гонка</h3><p>Отвечай правильно и двигайся вперёд.</p><button class="btn" onclick="race()">Играть</button></div>
+<div class="card"><div class="icon">🔌</div><h3>Электрическая цепь</h3><p>Собери простую цепь.</p><button class="btn" onclick="circuit()">Играть</button></div>
+<div class="card"><div class="icon">🧪</div><h3>Лаборатория</h3><p>Меняй параметры виртуального опыта.</p><button class="btn" onclick="lab()">Открыть</button></div>
+<div class="card"><div class="icon">⏱️</div><h3>Испытание на время</h3><p>Решай задания как можно быстрее.</p><button class="btn" onclick="startQuiz('time')">Играть</button></div>
+<div class="card"><div class="icon">👑</div><h3>Босс-уровень</h3><p>Серия сложных вопросов подряд.</p><button class="btn" onclick="startQuiz('boss')">Играть</button></div>
+<div class="card"><div class="icon">🎲</div><h3>Случайная игра</h3><p>Пусть игра сама выберет режим.</p><button class="btn" onclick="randomGame()">Играть</button></div>
+</div></section>
+
+<section id="play" class="screen">
+<button class="btn secondary back" onclick="show('games')">← Режимы</button>
+<div class="card"><h2 id="playTitle" class="title">Игра</h2><div id="playBody"></div></div>
+</section>
+
+<section id="learn" class="screen">
+<button class="btn secondary back" onclick="show('home')">← Главное меню</button><h2 class="title">📚 Учиться</h2>
+<div class="grid">
+<div class="card"><h3>📐 Формульник</h3><div class="formula">v = s / t</div><p>Скорость = путь ÷ время.</p><div class="formula">F = m · a</div><p>Сила = масса × ускорение.</p><div class="formula">A = F · s</div><p>Работа = сила × путь.</p></div>
+<div class="card"><h3>💡 Как решать</h3><p>1. Выпиши известные данные.</p><p>2. Выбери формулу.</p><p>3. Приведи единицы к СИ.</p><p>4. Подставь значения.</p><p>5. Проверь ответ.</p></div>
+<div class="card"><h3>📊 Разделы</h3><p>Механика • Кинематика • Динамика • Энергия • Электричество • Оптика</p><button class="btn" onclick="show('calculator')">Калькуляторы</button></div>
+</div></section>
+
+<section id="calculator" class="screen">
+<button class="btn secondary back" onclick="show('learn')">← Учиться</button><h2 class="title">🧮 Калькулятор</h2>
+<div class="card"><h3>Скорость</h3><label>Путь s (м)</label><input id="s" type="number" placeholder="Например 100"><label>Время t (с)</label><input id="t" type="number" placeholder="Например 20"><button class="btn" onclick="calcV()">Рассчитать</button><div id="calcResult" class="result"></div></div>
+</section>
+
+<section id="achievements" class="screen">
+<button class="btn secondary back" onclick="show('home')">← Главное меню</button><h2 class="title">🏅 Достижения</h2><div id="badges" class="grid"></div>
+</section>
+
+<section id="author" class="screen">
+<button class="btn secondary back" onclick="show('home')">← Главное меню</button><div class="card profile">
+<div class="avatar" id="avatar">👤</div><div><h2 style="margin:0">Махкамов Асадбек</h2><p class="muted">Ю-2.26</p><p>Автор проекта Physics Game.</p><input type="file" accept="image/*" onchange="setAvatar(event)"></div>
+</div>
+<div class="card" style="margin-top:15px"><h3>🖼️ Как добавить фотографию</h3><p>В этой версии можно выбрать фотографию прямо на устройстве. Для постоянной аватарки в GitHub можно позже добавить файл <b>avatar.jpg</b> в папку проекта.</p></div>
+</section>
+
+<section id="extra" class="screen"><button class="btn secondary back" onclick="show('games')">← Игры</button><div class="card"><div id="extraBody"></div></div></section>
+</main>
+<footer>Physics Game • Махкамов Асадбек • Ю-2.26</footer>
+</div>
+
+<script>
+const state={xp:+localStorage.getItem('xp')||0};
+let current={questions:[],i:0,type:''};
+const banks={
+kin:[
+['Автомобиль прошёл 120 м за 10 с. Какова скорость?',['12 м/с','1200 м/с','1,2 м/с','10 м/с'],0],
+['Тело движется со скоростью 5 м/с 8 с. Какой путь?',['13 м','40 м','3 м','80 м'],1],
+['Формула скорости?',['v=t/s','v=s/t','v=s+t','v=s·t'],1],
+['Какую величину измеряют в секундах?',['Массу','Силу','Время','Скорость'],2]],
+quiz:[
+['Единица силы в СИ?',['Джоуль','Ньютон','Паскаль','Ватт'],1],
+['Единица энергии?',['Джоуль','Ньютон','Ампер','Герц'],0],
+['Что характеризует массу?',['Количество вещества в смысле инертности','Скорость','Силу тока','Температуру'],0],
+['Прибор для измерения силы?',['Термометр','Динамометр','Барометр','Амперметр'],1]],
+riddle:[
+['Я показываю, как быстро меняется положение тела. Что я?',['Скорость','Масса','Температура','Плотность'],0],
+['Меня измеряют в ньютонах, я могу ускорить тело. Кто я?',['Работа','Сила','Энергия','Мощность'],1],
+['Я несу способность совершать работу. Кто я?',['Энергия','Время','Путь','Объём'],0]],
+tf:[
+['Скорость равна пути, делённому на время.',['Верно','Неверно'],0],
+['Единица силы — джоуль.',['Верно','Неверно'],1],
+['Ускорение показывает изменение скорости за время.',['Верно','Неверно'],0]],
+target:[
+['Чтобы увеличить дальность простого броска, нужно учитывать начальную скорость и угол. Это верно?',['Да','Нет'],0],
+['Если скорость увеличилась в 2 раза при том же времени, путь увеличится в...',['2 раза','4 раза','Не изменится','В 2 раза уменьшится'],0]],
+time:[
+['Если s=60 м и t=5 с, v=?',['10','12','15','20'],1],
+['F=ma. При m=2 кг и a=3 м/с² F=?',['5 Н','6 Н','9 Н','1,5 Н'],1],
+['P=A/t. Если A=100 Дж за 20 с, P=?',['5 Вт','20 Вт','80 Вт','2000 Вт'],0]],
+boss:[
+['Тело массой 4 кг движется с ускорением 2 м/с². Сила?',['2 Н','6 Н','8 Н','16 Н'],2],
+['Путь 150 м пройден за 30 с. Скорость?',['3 м/с','5 м/с','30 м/с','180 м/с'],1],
+['Работа силы 10 Н на пути 6 м равна?',['16 Дж','60 Дж','1,6 Дж','600 Дж'],1],
+['Мощность при работе 120 Дж за 10 с?',['12 Вт','120 Вт','1,2 Вт','130 Вт'],0]]
+};
+function save(){localStorage.setItem('xp',state.xp);updateStats()}
+function updateStats(){document.getElementById('xp').textContent=state.xp;document.getElementById('progressText').textContent=state.xp;document.getElementById('level').textContent=Math.floor(state.xp/100)+1}
+function show(id){document.querySelectorAll('.screen').forEach(x=>x.classList.remove('active'));document.getElementById(id).classList.add('active');if(id==='achievements')renderBadges();scrollTo(0,0)}
+function addXP(n){state.xp+=n;save()}
+function startQuiz(type){
+ current={questions:(banks[type]||banks.quiz).slice().sort(()=>Math.random()-.5),i:0,type};
+ show('play');renderQuestion();
+}
+function renderQuestion(){
+ const q=current.questions[current.i];document.getElementById('playTitle').textContent={kin:'🚀 Кинематика',quiz:'🧠 Викторина',riddle:'🕵️ Загадки',tf:'⚡ Верно / Неверно',target:'🎯 Попади в цель',time:'⏱️ Испытание',boss:'👑 Босс-уровень'}[current.type]||'Игра';
+ document.getElementById('playBody').innerHTML=`<div class="muted">Вопрос ${current.i+1} из ${current.questions.length}</div><div class="question">${q[0]}</div><div class="answers">${q[1].map((a,i)=>`<button onclick="answer(${i})">${String.fromCharCode(65+i)}. ${a}</button>`).join('')}</div><div id="feedback" class="feedback"></div>`;
+}
+function answer(i){
+ const q=current.questions[current.i],fb=document.getElementById('feedback');
+ if(i===q[2]){fb.textContent='✅ Правильно! +10 XP';addXP(10)}else{fb.textContent='❌ Неверно. Правильный ответ: '+q[1][q[2]]}
+ document.querySelectorAll('.answers button').forEach(b=>b.disabled=true);
+ setTimeout(()=>{current.i++; if(current.i<current.questions.length)renderQuestion();else finish()},850);
+}
+function finish(){document.getElementById('playBody').innerHTML=`<div class="question">🎉 Раунд завершён!</div><p class="muted">Ты заработал опыт за правильные ответы.</p><button class="btn" onclick="startQuiz('${current.type}')">Ещё раз</button> <button class="btn secondary" onclick="show('games')">К режимам</button>`}
+function puzzle(){show('play');document.getElementById('playTitle').textContent='🧩 Пазл';document.getElementById('playBody').innerHTML='<p class="question">Собери последовательность формулы скорости:</p><div class="smallgrid">'+['v','s','t','/','='].map(x=>`<button class="btn secondary" onclick="this.style.opacity=.4">${x}</button>`).join('')+'</div><p class="muted">Мини-версия пазла. Собери: v = s / t</p><button class="btn good" onclick="addXP(20);this.textContent=\'+20 XP получено!\'">Завершить пазл</button>'}
+function crossword(){show('play');document.getElementById('playTitle').textContent='🧩 Кроссворд';document.getElementById('playBody').innerHTML='<p>Ответь на определения:</p><p><b>1.</b> Величина, равная пути за единицу времени.</p><input id="cw1" placeholder="Ответ"><p><b>2.</b> Единица силы.</p><input id="cw2" placeholder="Ответ"><button class="btn" onclick="checkCross()">Проверить</button><div id="cwfb" class="feedback"></div>'}
+function checkCross(){let a=document.getElementById('cw1').value.toLowerCase(),b=document.getElementById('cw2').value.toLowerCase();if(a.includes('скорост')&&b.includes('ньют')){addXP(30);document.getElementById('cwfb').textContent='✅ Кроссворд решён! +30 XP'}else document.getElementById('cwfb').textContent='❌ Попробуй ещё раз.'}
+function pairs(){show('play');document.getElementById('playTitle').textContent='🔗 Соедини пары';document.getElementById('playBody').innerHTML='<p>Выбери правильную единицу:</p>'+[['Скорость',['м/с','Н','Дж']],['Сила',['Вт','Н','Па']],['Энергия',['Дж','А','кг']]].map((x,n)=>`<div class="card" style="margin:8px 0"><b>${x[0]}</b><div class="actions">${x[1].map((v,i)=>`<button class="btn secondary" onclick="pairCheck(this,${i===0?1:0},${n})">${v}</button>`).join('')}</div></div>`).join('')+'<div id="pairfb" class="feedback"></div>'}
+let pairScore=0;function pairCheck(btn,ok,n){if(btn.disabled)return;btn.disabled=true;if(ok){pairScore++;addXP(10);btn.textContent+=' ✓'}else btn.textContent+=' ✗';if(pairScore>=3){document.getElementById('pairfb').textContent='🎉 Все пары собраны!';pairScore=0}}
+function race(){startQuiz('time')}
+function circuit(){show('extra');document.getElementById('extraBody').innerHTML='<h2>🔌 Электрическая цепь</h2><p>Мини-симуляция: выбери элементы цепи.</p><div class="smallgrid"><button class="btn secondary" onclick="this.classList.toggle(\'good\')">🔋 Батарея</button><button class="btn secondary" onclick="this.classList.toggle(\'good\')">💡 Лампа</button><button class="btn secondary" onclick="this.classList.toggle(\'good\')">🔌 Провод</button><button class="btn secondary" onclick="this.classList.toggle(\'good\')">⏻ Выключатель</button></div><p class="muted">Подсказка: для простой цепи нужны источник, провод и потребитель.</p>'}
+function lab(){show('extra');document.getElementById('extraBody').innerHTML='<h2>🧪 Виртуальная лаборатория</h2><p>Измени массу и ускорение и посмотри на силу.</p><label>Масса: <span id="mv">2</span> кг</label><input type="range" min="1" max="10" value="2" oninput="document.getElementById(\'mv\').textContent=this.value;document.getElementById(\'force\').textContent=this.value*3"><label>Ускорение: 3 м/с²</label><div class="formula">F = <span id="force">6</span> Н</div>'}
+function randomGame(){let a=['kin','quiz','riddle','tf','target','time'];startQuiz(a[Math.floor(Math.random()*a.length)])}
+function calcV(){let s=+document.getElementById('s').value,t=+document.getElementById('t').value;if(s>=0&&t>0){document.getElementById('calcResult').textContent=`v = ${s/t} м/с`;addXP(5)}else document.getElementById('calcResult').textContent='Введите путь и время (время должно быть больше 0).'}
+function renderBadges(){let x=state.xp;document.getElementById('badges').innerHTML=[['🌟','Первые 10 XP',x>=10],['🔥','100 XP',x>=100],['🚀','500 XP',x>=500],['🧠','1000 XP',x>=1000]].map(b=>`<div class="badge ${b[2]?'':'locked'}"><div style="font-size:28px">${b[0]}</div><b>${b[1]}</b><p>${b[2]?'Получено':'Заблокировано'}</p></div>`).join('')}
+function setAvatar(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{document.getElementById('avatar').innerHTML=`<img src="${r.result}">`;localStorage.setItem('avatar',r.result)};r.readAsDataURL(f)}
+const savedAvatar=localStorage.getItem('avatar');if(savedAvatar)document.getElementById('avatar').innerHTML=`<img src="${savedAvatar}">`;updateStats();
+</script>
+</body>
+</html>

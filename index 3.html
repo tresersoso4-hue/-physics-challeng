@@ -1,0 +1,285 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>VESTIGE — Наука защиты</title>
+<style>
+:root{--bg:#05080b;--panel:#0a1116e8;--line:#a9dce833;--cyan:#9beaff;--muted:#83969e;--green:#73efb7;--red:#ff6e75}
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);color:#edf7fa;font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif}
+button{font:inherit;color:inherit}button{cursor:pointer}
+.app{position:fixed;inset:0;background:radial-gradient(circle at 50% 35%,#32616e1c,transparent 36%),#05080b}
+.app:before{content:"";position:absolute;inset:0;background:linear-gradient(#fff000 1px,transparent 1px),linear-gradient(90deg,#fff000 1px,transparent 1px);background-size:70px 70px;opacity:.018;pointer-events:none}
+.scan{position:absolute;inset:0;pointer-events:none;z-index:99;background:linear-gradient(transparent 49%,#b5effa08 50%,transparent 51%);background-size:100% 8px}
+.screen{position:absolute;inset:0;display:none}.screen.active{display:block;animation:enter .35s ease}@keyframes enter{from{opacity:0;transform:scale(1.015)}to{opacity:1;transform:none}}
+/* ГЛАВНАЯ */
+.home{position:absolute;inset:0;overflow:hidden;background:radial-gradient(circle at 50% 45%,#294b5420,transparent 32%),linear-gradient(115deg,#05090c,#081116 52%,#030607)}
+.home:after{content:"";position:absolute;inset:0;background:radial-gradient(circle at 50% 45%,transparent 20%,#0007 80%);pointer-events:none}
+.top{position:absolute;z-index:10;left:34px;right:34px;top:24px;display:flex;justify-content:space-between}
+.brand{font-size:21px;font-weight:850;letter-spacing:.28em}.brand small{display:block;color:#9eb4bc;font-size:9px;letter-spacing:.32em;margin-top:5px}
+.player{display:flex;gap:12px;align-items:center;text-align:right;font-size:10px;color:#c5dbe1}.avatar{display:grid;place-items:center;width:39px;height:39px;border:1px solid #7ebdcb66;border-radius:50%;color:var(--cyan);font-weight:800}
+.hero{position:absolute;z-index:10;left:6.5%;top:29%;max-width:470px}.kicker{color:var(--cyan);font-size:10px;letter-spacing:.32em;margin-bottom:12px}.hero h1{font-size:clamp(36px,5.3vw,74px);line-height:.92;margin:0 0 16px}.hero p{color:#b9c9ce;font-size:14px;margin:0 0 20px}
+.play,.back,.gb{border:1px solid #a9eaf877;background:#081218bb;padding:13px 28px;border-radius:3px;letter-spacing:.2em;font-size:11px;font-weight:800}.play:hover,.back:hover,.gb:hover{background:#39cce51c;border-color:#a9eaff;box-shadow:0 0 35px #39cce522}
+.cards{position:absolute;z-index:10;left:5%;right:5%;bottom:27px;display:grid;grid-template-columns:repeat(6,1fr);gap:10px}.card{min-height:84px;border:1px solid #b6dce51c;background:#050b0eb8;backdrop-filter:blur(8px);padding:13px;text-align:left;transition:.25s}.card:hover{transform:translateY(-4px);border-color:#9beaff77;background:#091319dd}.card b{display:block;font-size:10px;letter-spacing:.14em;margin-bottom:8px}.card span{font-size:9px;color:#91a5ad;line-height:1.35}
+.armorHero{position:absolute;z-index:5;left:50%;top:50%;transform:translate(-50%,-46%);width:min(37vw,520px);height:min(68vh,680px);filter:drop-shadow(0 35px 45px #000b);transition:.3s}
+.ring{position:absolute;left:50%;top:51%;transform:translate(-50%,-50%);width:min(46vw,600px);aspect-ratio:1;border:1px solid #9beaff18;border-radius:50%;box-shadow:0 0 100px #37c9e00d}.ring:after{content:"";position:absolute;inset:12%;border:1px dashed #9beaff18;border-radius:50%;animation:spin 25s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}
+/* detailed armor SVG */
+.armorSvg{width:100%;height:100%;overflow:visible}
+.armorMove{transform-origin:50% 50%;animation:float 4.5s ease-in-out infinite}@keyframes float{50%{transform:translateY(-7px) rotate(.3deg)}}
+.hub{position:absolute;inset:0;padding:34px 5%;overflow:auto;background:radial-gradient(circle at 75% 15%,#2f98b51c,transparent 30%),#05080b}.nav{display:flex;justify-content:space-between;align-items:center;margin-bottom:26px}.nav h2{margin:0;font-size:27px;letter-spacing:.08em}.small{color:var(--muted);font-size:11px;line-height:1.55}.modes{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;max-width:1200px;margin:auto}.mode{min-height:215px;border:1px solid var(--line);background:linear-gradient(145deg,#101a1fd9,#070c0fe8);padding:22px;text-align:left;transition:.25s}.mode:hover{transform:translateY(-6px);border-color:#9beaff77;box-shadow:0 20px 60px #0008}.mode .num{font-size:10px;color:var(--cyan);letter-spacing:.2em}.mode h3{margin:58px 0 8px;font-size:22px}.mode p{font-size:12px;color:#8da1a9;line-height:1.5}
+/* shared */
+.game{position:absolute;inset:0;background:#05080b}.gh{position:absolute;z-index:20;top:18px;left:25px;right:25px;display:flex;justify-content:space-between;align-items:center}.gt{font-size:11px;letter-spacing:.2em;color:var(--cyan)}.gb{padding:9px 13px;background:#071015e8}
+/* lab */
+.lab{position:absolute;inset:72px 5% 30px;display:grid;grid-template-columns:1.2fr .8fr;gap:18px}.stage{border:1px solid var(--line);display:grid;place-items:center;background:radial-gradient(circle,#38677422,transparent 45%),#070d10}.labArmor{width:min(52%,430px);aspect-ratio:.72;cursor:grab;transition:transform .08s;filter:drop-shadow(0 30px 35px #000b)}.labArmor:active{cursor:grabbing}.info{border:1px solid var(--line);background:#080f13e8;padding:21px;overflow:auto}.info h2{margin:0 0 8px}.zone{width:100%;padding:13px;margin:7px 0;text-align:left;background:#0b1419;border:1px solid #a9dce51a}.zone:hover,.zone.sel{border-color:#9beaff66;background:#0f1d23}.zone span{display:block;color:#758990;font-size:9px;margin-top:4px}.box{margin-top:15px;padding:13px;border-left:2px solid var(--cyan);background:#8adff00a;font-size:11px;line-height:1.55}
+/* puzzle */
+.wrap{position:absolute;inset:72px 6% 30px;display:grid;grid-template-columns:1fr 310px;gap:18px}.board,.side,.panel{border:1px solid var(--line);background:#080f13e8;padding:20px}.board{display:grid;place-items:center}.grid{width:min(68vw,600px);aspect-ratio:1;display:grid;grid-template-columns:repeat(4,1fr);gap:7px}.tile{background:#101b20;border:1px solid #a9dce51c;display:grid;place-items:center}.tile.sel{border-color:var(--cyan);box-shadow:0 0 22px #49d9ed22}.piece{width:67%;height:67%;border-radius:16%;background:linear-gradient(145deg,#60747a,#1a282d);box-shadow:inset 0 0 0 3px #0006}.big{font-size:43px;color:var(--cyan);font-weight:850;margin:18px 0}
+/* physics */
+.physics{position:absolute;inset:72px 6% 30px;display:grid;grid-template-columns:1fr 1fr;gap:18px}.range{margin:20px 0}.range label{display:flex;justify-content:space-between;font-size:11px}.range input{width:100%;accent-color:var(--cyan)}.formula{font-size:35px;text-align:center;padding:26px}.result{font-size:46px;color:var(--cyan);font-weight:850;text-align:center}.graph{height:190px;border:1px solid var(--line);background:repeating-linear-gradient(0deg,transparent 0 37px,#a0d8e10b 38px),repeating-linear-gradient(90deg,transparent 0 55px,#a0d8e10b 56px)}
+/* range */
+.rangeScene{position:absolute;inset:0;background:radial-gradient(circle at 50% 40%,#4a7c8718,transparent 35%),linear-gradient(#071014,#030608)}.floor{position:absolute;bottom:0;left:0;right:0;height:43%;transform:perspective(500px) rotateX(58deg);transform-origin:bottom;background:repeating-linear-gradient(90deg,#9beaff08 0 1px,transparent 1px 80px)}.man{position:absolute;left:50%;top:51%;transform:translate(-50%,-50%);width:190px;height:350px}.head{position:absolute;left:65px;width:60px;height:70px;border-radius:45%;background:linear-gradient(135deg,#65777b,#1a2427);border:3px solid #0b1012}.torso{position:absolute;left:38px;top:62px;width:115px;height:190px;border-radius:27% 27% 16% 16%;background:linear-gradient(100deg,#4c5d62,#131d21);border:4px solid #090f12}.vest{position:absolute;left:45px;top:76px;width:100px;height:140px;border-radius:22%;background:linear-gradient(145deg,#4c5e63,#111a1e);border:3px solid #9db8be;box-shadow:inset 0 0 0 5px #172328}.leg{position:absolute;top:240px;width:45px;height:105px;background:#1a2529;border:3px solid #0a1012;border-radius:8px}.l1{left:43px}.l2{right:43px}.scanbox{position:absolute;left:50%;top:48%;transform:translate(-50%,-50%);width:250px;height:310px;border:1px solid #9beaff99;box-shadow:0 0 35px #32c8e01f}.scanline{position:absolute;left:0;right:0;top:30%;height:1px;background:var(--cyan);box-shadow:0 0 16px var(--cyan);animation:scan 2.4s linear infinite}@keyframes scan{from{transform:translateY(-75px)}to{transform:translateY(145px)}}.rpanel{position:absolute;right:25px;top:75px;width:285px;border:1px solid var(--line);background:#060b0edb;padding:18px}.integrity{height:8px;background:#111a1e;margin:8px 0 16px}.integrity i{display:block;height:100%;width:82%;background:var(--green)}.zbtn{display:grid;grid-template-columns:1fr 1fr;gap:6px}.zbtn button{background:#0c1519;border:1px solid var(--line);padding:9px;font-size:10px}
+/* quiz/materials */
+.center{position:absolute;inset:0;display:grid;place-items:center;background:radial-gradient(circle,#417f8d20,transparent 45%),#05080b}.quizCard{width:min(720px,90%);border:1px solid var(--line);background:#080f13f2;padding:30px}.qopt{display:block;width:100%;padding:14px;margin:7px 0;background:#0b1519;border:1px solid var(--line);text-align:left}.qopt:hover{border-color:var(--cyan)}.materials{position:absolute;inset:72px 7% 30px;display:grid;grid-template-columns:1fr 1fr;gap:12px}.mat{border:1px solid var(--line);background:linear-gradient(145deg,#101a1f,#070c0f);padding:20px;text-align:left}.mat:hover{border-color:#9beaff66}.meter{height:6px;background:#11191d;margin:7px 0 14px}.meter i{display:block;height:100%;background:var(--cyan)}
+.modal{position:absolute;inset:0;z-index:200;display:none;place-items:center;background:#000b;backdrop-filter:blur(9px)}.modal.show{display:grid}.modalCard{width:min(600px,90%);border:1px solid var(--line);background:#080e12;padding:25px}
+@media(max-width:850px){.cards{grid-template-columns:repeat(2,1fr);max-height:180px;overflow:auto;bottom:8px}.hero{top:20%;left:6%}.armorHero{width:60vw;height:58vh;opacity:.78}.modes{grid-template-columns:1fr}.lab,.wrap,.physics,.materials{grid-template-columns:1fr}.info,.side{display:none}.grid{width:min(82vw,500px)}.rpanel{right:10px;top:auto;bottom:10px;width:260px}}
+
+<style>
+/* V8 — улучшенная броня */
+.armorHero{width:min(41vw,560px);height:min(72vh,720px);filter:drop-shadow(0 42px 38px #000d) drop-shadow(0 0 28px #5ad7e312)}
+.armorSvg{overflow:visible}
+.armorSvg .armorMove{animation:vestFloat 4.8s ease-in-out infinite;transform-origin:210px 330px}
+@keyframes vestFloat{0%,100%{transform:translateY(0) rotate(-.25deg)}50%{transform:translateY(-8px) rotate(.35deg)}}
+.armorHero:before{content:"";position:absolute;inset:15% 13%;border-radius:42%;background:radial-gradient(ellipse,#9beaff0d,transparent 65%);filter:blur(12px);pointer-events:none}
+.stage:before{content:"360°";position:absolute;top:18px;left:20px;color:#8fb4bd;font-size:9px;letter-spacing:.25em}
+.stage{position:relative}
+.labArmor{width:min(60%,470px);filter:drop-shadow(0 35px 35px #000d)}
+/* премиальные подсветки */
+.card,.mode,.panel,.info,.side,.board,.mat,.quizCard{box-shadow:inset 0 1px 0 #ffffff08}
+.card:hover,.mode:hover,.mat:hover{box-shadow:0 18px 55px #0008,inset 0 1px 0 #b9efff16}
+</style>
+</style>
+</head>
+<body>
+<div class="app"><div class="scan"></div>
+
+<!-- HERO -->
+<section id="home" class="screen active">
+<div class="home">
+<div class="ring"></div>
+<div class="top"><div class="brand">VESTIGE<small>НАУКА ЗАЩИТЫ</small></div><div class="player">ИГРОК 174 · УРОВЕНЬ <b id="homeLevel">1</b><div class="avatar">A</div></div></div>
+
+<div class="armorHero">
+<svg class="armorSvg" viewBox="0 0 420 650" aria-label="realistic tactical armor vest">
+<defs>
+<linearGradient id="fabric" x1="0" x2="1"><stop stop-color="#52656a"/><stop offset=".18" stop-color="#253439"/><stop offset=".52" stop-color="#111a1e"/><stop offset=".8" stop-color="#35464b"/><stop offset="1" stop-color="#11181b"/></linearGradient>
+<linearGradient id="plate" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#77898d"/><stop offset=".18" stop-color="#39494e"/><stop offset=".58" stop-color="#151f23"/><stop offset="1" stop-color="#53666b"/></linearGradient>
+<linearGradient id="strap" x1="0" x2="1"><stop stop-color="#0b1012"/><stop offset=".5" stop-color="#34464b"/><stop offset="1" stop-color="#0a0f11"/></linearGradient>
+<filter id="shadow"><feDropShadow dx="0" dy="25" stdDeviation="18" flood-color="#000" flood-opacity=".75"/></filter>
+</defs>
+<g class="armorMove" filter="url(#shadow)">
+<!-- shoulder straps -->
+<path d="M92 154 Q70 105 112 72 Q135 58 154 92 L173 160" fill="url(#strap)" stroke="#0a0f11" stroke-width="8"/>
+<path d="M328 154 Q350 105 308 72 Q285 58 266 92 L247 160" fill="url(#strap)" stroke="#0a0f11" stroke-width="8"/>
+<!-- body shell -->
+<path d="M105 150 Q210 112 315 150 L344 270 L324 505 Q315 555 270 575 L150 575 Q105 555 96 505 L76 270 Z" fill="url(#fabric)" stroke="#070c0e" stroke-width="9"/>
+<!-- central plate carrier -->
+<path d="M125 180 Q210 148 295 180 L313 360 Q308 405 280 426 L140 426 Q112 405 107 360 Z" fill="url(#plate)" stroke="#10191c" stroke-width="7"/>
+<!-- plate contour -->
+<path d="M139 194 Q210 171 281 194 L293 347 Q288 380 266 397 L154 397 Q132 380 127 347 Z" fill="#121c20" opacity=".8" stroke="#8aa0a555" stroke-width="2"/>
+<!-- molle rows -->
+<g stroke="#879b9f55" stroke-width="4">
+<path d="M113 223H307"/><path d="M111 250H309"/><path d="M110 277H310"/><path d="M109 304H311"/><path d="M108 331H312"/>
+</g>
+<!-- cummerbund -->
+<path d="M78 335 Q98 325 111 345 L119 478 Q104 498 82 489 L66 400Z" fill="#26373b" stroke="#0a1113" stroke-width="6"/>
+<path d="M342 335 Q322 325 309 345 L301 478 Q316 498 338 489 L354 400Z" fill="#26373b" stroke="#0a1113" stroke-width="6"/>
+<!-- pouches -->
+<g stroke="#080f11" stroke-width="5">
+<rect x="112" y="431" width="62" height="70" rx="8" fill="#304247"/><rect x="178" y="431" width="64" height="70" rx="8" fill="#304247"/><rect x="246" y="431" width="62" height="70" rx="8" fill="#304247"/>
+<path d="M120 449h46M186 449h48M254 449h46" stroke="#8aa0a444" stroke-width="4"/>
+</g>
+<!-- buckles -->
+<g fill="#0b1113" stroke="#849ba055" stroke-width="3"><rect x="93" y="173" width="25" height="40" rx="5"/><rect x="302" y="173" width="25" height="40" rx="5"/><rect x="88" y="286" width="25" height="40" rx="5"/><rect x="307" y="286" width="25" height="40" rx="5"/></g>
+<!-- velcro panel -->
+<rect x="155" y="210" width="110" height="30" rx="3" fill="#090f12" stroke="#95aeb344"/><text x="210" y="230" text-anchor="middle" fill="#a8c4c9" font-size="12" font-family="Arial" letter-spacing="3">VESTIGE</text>
+<!-- stitching -->
+<path d="M94 165 Q210 125 326 165 M89 390 Q210 418 331 390 M109 520 Q210 545 311 520" fill="none" stroke="#b3c5c733" stroke-width="2" stroke-dasharray="5 6"/>
+</g></svg>
+</div>
+
+<div class="hero"><div class="kicker">СИСТЕМА АКТИВНА · V8</div><h1>ЗАЩИТА,<br>СОЗДАННАЯ С УМОМ.</h1><p>Изучай. Проверяй. Играй.</p><button class="play" id="play">ИГРАТЬ</button></div>
+<div class="cards">
+<button class="card" data-open="lab"><b>01 · ЛАБОРАТОРИЯ БРОНИ</b><span>Изучи конструкцию и найди элементы.</span></button>
+<button class="card" data-open="assembly"><b>02 · СБОРКА</b><span>Собери конструкцию правильно и быстро.</span></button>
+<button class="card" data-open="range"><b>03 · ИСПЫТАТЕЛЬНЫЙ ПОЛИГОН</b><span>Проведи учебное сканирование манекена.</span></button>
+<button class="card" data-open="materials"><b>04 · МАТЕРИАЛЫ</b><span>Сравни свойства и выбери подходящий баланс.</span></button>
+<button class="card" data-open="physics"><b>05 · ФИЗИКА</b><span>Решай задачи и наблюдай физику в реальном времени.</span></button>
+<button class="card" data-open="quiz"><b>06 · ЭКЗАМЕН</b><span>Новые вопросы и перемешанные ответы.</span></button>
+</div></div></section>
+
+<!-- ЦЕНТР -->
+<section id="hub" class="screen"><div class="hub">
+<div class="nav"><div><h2>ЦЕНТР МИССИЙ</h2><div class="small">6 МИССИЙ · ПРОГРЕСС СОХРАНЯЕТСЯ</div></div><div class="small">УРОВЕНЬ <b id="level">1</b> <span class="xp"><i id="xp"></i></span> <span id="xpText">0 / 100 ОПЫТ</span> <button class="back" data-back>ГЛАВНАЯ</button></div></div>
+<div class="modes"><div class="mode" data-open="mission"><span class="num">07 / МИССИЯ</span><h3>ИНЖЕНЕРНАЯ МИССИЯ</h3><p>Пройди цепочку задач: анализ → материал → сборка → физика. Итог зависит от твоих решений.</p></div>
+<div class="mode" data-open="lab"><span class="num">01 / АНАЛИЗ</span><h3>ЛАБОРАТОРИЯ БРОНИ</h3><p>Осматривай броню, вращай её и находи элементы конструкции. За правильный анализ получай опыт.</p></div>
+<div class="mode" data-open="assembly"><span class="num">02 / НАВЫК</span><h3>СБОРКА</h3><p>Собери конструкцию из перемешанных элементов. Ошибки стоят времени, правильные ходы дают очки.</p></div>
+<div class="mode" data-open="range"><span class="num">03 / СКАНИРОВАНИЕ</span><h3>ИСПЫТАТЕЛЬНЫЙ ПОЛИГОН</h3><p>Сканируй зоны учебного манекена и определяй состояние разных участков.</p></div>
+<div class="mode" data-open="materials"><span class="num">04 / ИССЛЕДОВАНИЕ</span><h3>МАТЕРИАЛЫ</h3><p>Сравни массу, жёсткость и гибкость материалов и выбери лучший баланс под задачу.</p></div>
+<div class="mode" data-open="physics"><span class="num">05 / ФИЗИЧЕСКАЯ МОДЕЛЬ</span><h3>ФИЗИЧЕСКАЯ МОДЕЛЬ</h3><p>Меняй массу и скорость и наблюдай, как меняется кинетическая энергия.</p></div>
+<div class="mode" data-open="quiz"><span class="num">06 / ЗНАНИЯ</span><h3>ЭКЗАМЕН</h3><p>Проверь знания: вопросы и варианты ответов меняются при каждом запуске.</p></div>
+</div></div></section>
+
+<!-- LAB -->
+<section id="lab" class="screen"><div class="game"><div class="gh"><div class="gt">ЛАБОРАТОРИЯ БРОНИ · INTERACTIVE ANALYSIS</div><button class="gb" data-back>ЦЕНТР</button></div>
+<div class="lab"><div class="stage"><div class="labArmor" id="labArmor">
+<svg class="armorSvg" viewBox="0 0 420 650">
+<defs><linearGradient id="f2" x1="0" x2="1"><stop stop-color="#5a6c71"/><stop offset=".3" stop-color="#202e33"/><stop offset=".7" stop-color="#10181b"/><stop offset="1" stop-color="#44575c"/></linearGradient><linearGradient id="p2" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#819296"/><stop offset=".45" stop-color="#202d32"/><stop offset="1" stop-color="#596b70"/></linearGradient></defs>
+<path d="M105 150Q210 112 315 150L344 270 324 505Q315 555 270 575H150Q105 555 96 505L76 270Z" fill="url(#f2)" stroke="#070c0e" stroke-width="9"/>
+<path d="M125 180Q210 148 295 180L313 360Q308 405 280 426H140Q112 405 107 360Z" fill="url(#p2)" stroke="#10191c" stroke-width="7"/>
+<g stroke="#a1b7bb44" stroke-width="4"><path d="M113 223H307"/><path d="M111 250H309"/><path d="M110 277H310"/><path d="M109 304H311"/><path d="M108 331H312"/></g>
+<path d="M78 335Q98 325 111 345L119 478Q104 498 82 489L66 400Z" fill="#26373b" stroke="#0a1113" stroke-width="6"/><path d="M342 335Q322 325 309 345L301 478Q316 498 338 489L354 400Z" fill="#26373b" stroke="#0a1113" stroke-width="6"/>
+<g fill="#304247" stroke="#080f11" stroke-width="5"><rect x="112" y="431" width="62" height="70" rx="8"/><rect x="178" y="431" width="64" height="70" rx="8"/><rect x="246" y="431" width="62" height="70" rx="8"/></g>
+<path d="M94 165Q210 125 326 165M89 390Q210 418 331 390M109 520Q210 545 311 520" fill="none" stroke="#c1d1d433" stroke-width="2" stroke-dasharray="5 6"/>
+</svg></div></div>
+<div class="info"><h2>ИЗУЧИ БРОНЮ</h2><p class="small">Вращай модель пальцем/мышью. Нажимай элементы, чтобы открыть данные и получить ОПЫТ.</p>
+<button class="zone" data-zone="plate"><b>ЦЕНТРАЛЬНАЯ ПЛИТА</b><span>основная защитная зона учебной модели</span></button><button class="zone" data-zone="web"><b>СИСТЕМА КРЕПЛЕНИЙ</b><span>ленты и крепления конструкции</span></button><button class="zone" data-zone="pouch"><b>СИСТЕМА ПОДСУМКОВ</b><span>модульная организация снаряжения</span></button><div class="box" id="zoneInfo">Выбери элемент справа, чтобы изучить его.</div></div></div></div></section>
+
+<!-- СБОРКА -->
+<section id="assembly" class="screen"><div class="game"><div class="gh"><div class="gt">СБОРКА · BUILD SEQUENCE</div><div><span id="time">45</span>s · <span id="score">0</span> ОЧКИ <button class="gb" data-back>ЦЕНТР</button></div></div><div class="wrap"><div class="board"><div class="grid" id="grid"></div></div><div class="side"><h2>СБОРКА RUN</h2><p class="small">Поставь элементы в правильный порядок. Меняй две плитки местами. Чем быстрее соберёшь — тем больше очков.</p><div class="big" id="big">0</div><button class="gb" id="restart">НОВАЯ ПОПЫТКА</button></div></div></div></section>
+
+<!-- МАТЕРИАЛЫ -->
+<section id="materials" class="screen"><div class="game"><div class="gh"><div class="gt">МАТЕРИАЛЫ · TRADE-OFF LAB</div><button class="gb" data-back>ЦЕНТР</button></div><div class="materials" id="materialsBox"></div></div></section>
+
+<!-- PHYSICS -->
+<section id="physics" class="screen"><div class="game"><div class="gh"><div class="gt">ФИЗИЧЕСКАЯ МОДЕЛЬ · ENERGY</div><button class="gb" data-back>ЦЕНТР</button></div><div class="physics"><div class="panel"><h2>КИНЕТИЧЕСКАЯ ЭНЕРГИЯ</h2><p class="small">Меняй массу и скорость — результат меняется в реальном времени.</p><div class="range"><label>МАССА <b id="mv">5 kg</b></label><input id="mass" type="range" min="1" max="40" value="5"></div><div class="range"><label>СКОРОСТЬ <b id="vv">10 m/s</b></label><input id="vel" type="range" min="1" max="60" value="10"></div><div class="formula">E = ½mv²</div><div class="result" id="energy">250 J</div></div><div class="panel"><h2>ГРАФИК ЭНЕРГИИ</h2><div class="graph"><svg id="svg" viewBox="0 0 500 190" preserveAspectRatio="none" style="width:100%;height:100%"></svg></div><p class="small">Скорость влияет на энергию квадратично.</p></div></div></div></section>
+
+<!-- RANGE -->
+<section id="range" class="screen"><div class="game"><div class="rangeScene"><div class="floor"></div><div class="man"><div class="head"></div><div class="torso"></div><div class="vest"></div><div class="leg l1"></div><div class="leg l2"></div></div><div class="scanbox"><div class="scanline"></div></div><div class="rpanel"><div class="gt">УЧЕБНЫЙ МАНЕКЕН</div><h3 id="rtitle">ВЫБЕРИ ЗОНУ</h3><p class="small">Безопасный учебный режим: только анализ, данные и физика.</p><div class="integrity"><i id="integrity"></i></div><div class="zbtn"><button data-r="chest">ГРУДЬ</button><button data-r="shoulder">ПЛЕЧО</button><button data-r="side">БОК</button><button data-r="lower">НИЖНЯЯ ЗОНА</button></div><div class="box" id="rinfo">Выбери зону для анализа.</div></div><div class="gh"><div class="gt">ИСПЫТАТЕЛЬНЫЙ ПОЛИГОН · PROTECTION SCAN</div><button class="gb" data-back>ЦЕНТР</button></div></div></div></section>
+
+<!-- ЭКЗАМЕН -->
+<section id="quiz" class="screen"><div class="center"><div class="quizCard"><div class="gt">ЭКЗАМЕН · RANDOMIZED</div><div class="small" id="qcount"></div><h2 id="question"></h2><div id="options"></div><p class="small" id="feedback"></p><button class="gb" id="next" style="display:none">ДАЛЕЕ</button></div></div></section>
+
+
+<section id="mission" class="screen"><div class="center">
+<div class="quizCard">
+<div class="gt">ИНЖЕНЕРНАЯ МИССИЯ · 4 ЭТАПА</div>
+<h2 id="missionTitle">ЭТАП 1 · АНАЛИЗ</h2>
+<p class="small" id="missionText">Выбери элемент конструкции, который отвечает за основную центральную защитную зону.</p>
+<div id="missionOptions"></div>
+<p class="small" id="missionStatus">Пройдено: 0 / 4</p>
+<button class="gb" id="missionNext" style="display:none">СЛЕДУЮЩИЙ ЭТАП</button>
+<button class="gb" data-back>В ЦЕНТР</button>
+</div></div></section>
+<div class="modal" id="modal"><div class="modalCard"><h2 id="mt"></h2><p class="small" id="mb"></p><button class="gb" id="close">CONTINUE</button></div></div>
+</div>
+
+<script>
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+let xp=+localStorage.vxp||0,level=+localStorage.vlevel||1;
+function save(){localStorage.vxp=xp;localStorage.vlevel=level}
+function gain(n){xp+=n;while(xp>=100){xp-=100;level++}save();$('#level').textContent=level;$('#homeLevel').textContent=level;$('#xp').style.width=xp+'%';$('#xpText').textContent=xp+' / 100 ОПЫТ'}
+function show(id){$$('.screen').forEach(x=>x.classList.remove('active'));$('#'+id).classList.add('active');if(id==='assembly')assembly();if(id==='materials')materials();if(id==='quiz')quiz()}
+$('#play').onclick=()=>show('hub');$$('[data-open]').forEach(x=>x.onclick=()=>show(x.dataset.open));$$('[data-back]').forEach(x=>x.onclick=()=>show('hub'));$('#close').onclick=()=>$('#modal').classList.remove('show');gain(0);
+
+const zd={plate:['ЦЕНТРАЛЬНАЯ ПЛИТА','Центральная жёсткая часть учебной модели.','10'],web:['СИСТЕМА КРЕПЛЕНИЙ','Ленты и крепления удерживают элементы.','8'],pouch:['СИСТЕМА ПОДСУМКОВ','Модульная часть компоновки.','8']};
+$$('.zone').forEach(b=>b.onclick=()=>{let d=zd[b.dataset.zone];$('#zoneInfo').innerHTML='<b>'+d[0]+'</b><br>'+d[1]+'<br><span style="color:var(--green)">+'+d[2]+' ОПЫТ</span>';gain(+d[2]);b.classList.add('sel')});
+let rot=0,scale=1,drag=false,last=0;
+$('#labArmor').onpointerdown=e=>{drag=true;last=e.clientX;$('#labArmor').setPointerCapture(e.pointerId)}
+$('#labArmor').onpointermove=e=>{if(!drag)return;rot+=(e.clientX-last)*.55;last=e.clientX;$('#labArmor').style.transform='perspective(900px) rotateY('+rot+'deg) scale('+scale+')'}
+$('#labArmor').onpointerup=()=>drag=false;$('#labArmor').onwheel=e=>{e.preventDefault();scale=Math.max(.8,Math.min(1.45,scale-e.deltaY*.0007));$('#labArmor').style.transform='perspective(900px) rotateY('+rot+'deg) scale('+scale+')'};
+
+let chosen=null,sc=0,timer;
+function assembly(){clearInterval(timer);chosen=null;sc=0;let a=Array.from({length:16},(_,i)=>i).sort(()=>Math.random()-.5),g=$('#grid');g.innerHTML='';a.forEach(v=>{let b=document.createElement('button');b.className='tile';b.dataset.v=v;b.innerHTML='<div class="piece" style="transform:rotate('+v*11+'deg) scale('+(0.7+(v%4)*.06)+')"></div>';b.onclick=()=>swap(b);g.appendChild(b)});$('#score').textContent=0;$('#big').textContent=0;let t=45;$('#time').textContent=t;timer=setInterval(()=>{t--;$('#time').textContent=t;if(t<=0)clearInterval(timer)},1000)}
+function swap(b){if(!chosen){chosen=b;b.classList.add('sel');return}if(chosen===b){b.classList.remove('sel');chosen=null;return}let v=chosen.dataset.v;chosen.dataset.v=b.dataset.v;b.dataset.v=v;$$('.tile').forEach(x=>x.classList.remove('sel'));chosen=null;sc+=5;$('#score').textContent=sc;$('#big').textContent=sc;if($$('.tile').every((x,i)=>+x.dataset.v===i)){clearInterval(timer);gain(30);modal('СБОРКА COMPLETE','Идеальная сборка. +30 ОПЫТ.')}}}
+$('#restart').onclick=assembly;
+
+const mats=[['КОМПОЗИТ','Общий баланс',72,86,58],['КЕРАМИЧЕСКИЙ ТИП','Жёсткость',88,94,35],['ГИБКИЙ ТЕКСТИЛЬ','Гибкость',42,45,96],['ГИБРИД','Адаптивность',63,79,78]];
+function materials(){let b=$('#materialsBox');b.innerHTML='';mats.forEach(m=>{let x=document.createElement('button');x.className='mat';x.innerHTML='<div class="gt">'+m[0]+'</div><h2>'+m[1]+'</h2><p class="small">МАССА</p><div class="meter"><i style="width:'+m[2]+'%"></i></div><p class="small">ЖЁСТКОСТЬ</p><div class="meter"><i style="width:'+m[3]+'%"></i></div><p class="small">ГИБКОСТЬ</p><div class="meter"><i style="width:'+m[4]+'%"></i></div>';x.onclick=()=>{gain(5);modal(m[0],'Учебный профиль: масса '+m[2]+', жёсткость '+m[3]+', гибкость '+m[4]+'.')};b.appendChild(x)})}
+
+function physics(){let m=+$('#mass').value,v=+$('#vel').value,e=.5*m*v*v;$('#mv').textContent=m+' kg';$('#vv').textContent=v+' m/s';$('#energy').textContent=Math.round(e)+' J';let p=[];for(let i=0;i<=100;i++){let vv=1+i*.59,ee=.5*m*vv*vv,y=185-Math.min(175,ee/72000*175);p.push(i*5+','+y)}$('#svg').innerHTML='<polyline points="'+p.join(' ')+'" fill="none" stroke="#9beaff" stroke-width="2"/>'}
+$('#mass').oninput=physics;$('#vel').oninput=physics;physics();
+
+const ri={chest:'Центральная зона: учебный статус сканирования.',shoulder:'Плечевая зона: анализ покрытия.',side:'Боковая зона: анализ покрытия.',lower:'Нижняя зона: анализ положения.'};
+$$('[data-r]').forEach(b=>b.onclick=()=>{let n=50+Math.floor(Math.random()*45);$('#rtitle').textContent=b.dataset.r.toUpperCase()+' · ANALYZED';$('#rinfo').textContent=ri[b.dataset.r];$('#integrity').style.width=n+'%';$('#integrity').style.background=n>72?'var(--green)':'var(--red)';gain(7)});
+
+const bank=[
+['Что происходит с кинетической энергией при увеличении скорости в 2 раза?',['В 2 раза','В 4 раза','Не меняется','Уменьшается'],1],
+['Единица энергии в СИ?',['Ньютон','Паскаль','Джоуль','Ватт'],2],
+['Какая величина стоит в квадрате в E=½mv²?',['Масса','Скорость','Время','Сила'],1],
+['Если скорость равна нулю, кинетическая энергия равна…',['0','1 J','100 J','Неизвестно'],0],
+['Что измеряется в килограммах?',['Масса','Энергия','Скорость','Мощность'],0],
+['Что измеряется в м/с?',['Энергия','Скорость','Масса','Сила'],1],
+['Зачем сравнивать материалы?',['Чтобы изучать компромиссы свойств','Чтобы менять шрифт','Чтобы скрывать формулы','Чтобы ускорять игру'],0],
+['Если массу увеличить в 3 раза при той же скорости, E…',['В 3 раза','В 9 раз','Не изменится','Уменьшится'],0],
+['Что означает v?',['Скорость','Объём','Напряжение','Время'],0],
+['Какая формула используется?',['E=mc²','E=½mv²','F=ma²','P=mv'],1]
+];
+let qs=[],qi=0,correct=0;
+function quiz(){qs=[...bank].sort(()=>Math.random()-.5).slice(0,7);qi=0;correct=0;renderQ()}
+function renderQ(){let q=qs[qi];$('#qcount').textContent='ВОПРОС '+(qi+1)+' / '+qs.length;$('#question').textContent=q[0];$('#feedback').textContent='';$('#next').style.display='none';let o=$('#options');o.innerHTML='';q[1].map((x,i)=>({x,i})).sort(()=>Math.random()-.5).forEach(z=>{let b=document.createElement('button');b.className='qopt';b.textContent=z.x;b.onclick=()=>answer(b,z.i,q[2]);o.appendChild(b)})}
+function answer(b,i,c){$$('.qopt').forEach(x=>x.disabled=true);if(i===c){b.style.borderColor='var(--green)';$('#feedback').textContent='ПРАВИЛЬНО · +10 ОПЫТ';correct++;gain(10)}else{b.style.borderColor='var(--red)';$('#feedback').textContent='НЕПРАВИЛЬНО'}$('#next').style.display='inline-block'}
+$('#next').onclick=()=>{qi++;if(qi<qs.length)renderQ();else modal('ЭКЗАМЕН COMPLETE','Результат: '+correct+' / '+qs.length+'. ОПЫТ сохранён.')};
+
+const missionData=[
+ {t:"ЭТАП 1 · АНАЛИЗ",q:"Какой элемент учебной модели является центральной жёсткой зоной?",o:["Подсумок","Центральная плита","Плечевая лента","Нижняя стропа"],a:1},
+ {t:"ЭТАП 2 · МАТЕРИАЛ",q:"Если важны и гибкость, и жёсткость, какой подход логичнее изучать?",o:["Только один показатель","Гибридный вариант","Только масса","Игнорировать свойства"],a:1},
+ {t:"ЭТАП 3 · ФИЗИКА",q:"При неизменной массе увеличение скорости сильнее всего влияет на кинетическую энергию потому что скорость…",o:["стоит в квадрате","исчезает из формулы","делится на массу","не влияет"],a:0},
+ {t:"ЭТАП 4 · РЕШЕНИЕ",q:"Что является лучшим инженерным решением в учебной задаче?",o:["Максимум одного свойства","Баланс свойств под задачу","Случайный выбор","Самый тяжёлый вариант"],a:1}
+];
+let mi=0,mScore=0;
+function mission(){mi=0;mScore=0;renderMission()}
+function renderMission(){
+ const d=missionData[mi],o=$('#missionOptions');
+ $('#missionTitle').textContent=d.t;$('#missionText').textContent=d.q;
+ $('#missionStatus').textContent='Пройдено: '+mi+' / 4';$('#missionNext').style.display='none';o.innerHTML='';
+ d.o.forEach((v,i)=>{let b=document.createElement('button');b.className='qopt';b.textContent=v;b.onclick=()=>{
+   $$('#missionOptions .qopt').forEach(x=>x.disabled=true);
+   if(i===d.a){b.style.borderColor='var(--green)';mScore+=25;gain(15);$('#missionText').textContent='Правильно. Решение принято.'}
+   else{b.style.borderColor='var(--red)';$('#missionText').textContent='Не совсем. Проанализируй условие ещё раз.'}
+   $('#missionNext').style.display='inline-block';
+ };o.appendChild(b)})
+}
+$('#missionNext').onclick=()=>{mi++;if(mi<4)renderMission();else{modal('МИССИЯ ЗАВЕРШЕНА','Итоговый результат: '+mScore+' очков. Ты прошёл всю инженерную цепочку.');mission()}}
+
+function modal(t,b){$('#mt').textContent=t;$('#mb').textContent=b;$('#modal').classList.add('show')}
+</script>
+
+<style>
+#v9{position:fixed;inset:0;z-index:99999;background:rgba(4,7,12,.98);display:none;overflow:auto;color:#eef4fb}
+.v9w{max-width:1180px;margin:auto;padding:22px}.v9h{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #26364b;padding-bottom:15px}.v9t{font-size:clamp(25px,5vw,46px);font-weight:900}.v9s{opacity:.62;margin-top:4px}.v9x{background:#121d2c;border:1px solid #3a4d66;color:#fff;padding:10px 14px;border-radius:10px;cursor:pointer}.v9g{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px;margin-top:20px}.v9c{background:linear-gradient(145deg,#121d2c,#0a111b);border:1px solid #2b3c54;border-radius:16px;padding:18px;min-height:180px;display:flex;flex-direction:column;justify-content:space-between}.v9c h3{margin:5px 0}.v9c p{opacity:.68;line-height:1.45;font-size:14px}.v9b{background:#edf3fa;color:#08101a;border:0;border-radius:10px;padding:11px 15px;font-weight:800;cursor:pointer}.v9p{margin-top:18px;background:#0d1622;border:1px solid #2b3c54;border-radius:16px;padding:20px}.v9o{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-top:15px}.v9o button{padding:14px;text-align:left;background:#121e2e;border:1px solid #354a63;color:#fff;border-radius:11px;cursor:pointer}.v9o button:hover{border-color:#b5c8df}.good{border-color:#65d78b!important;background:#10281a!important}.bad{border-color:#e87979!important;background:#2b1212!important}.v9stat{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}.v9pill{background:#132033;border:1px solid #2a3d56;border-radius:99px;padding:7px 11px;font-size:13px}.v9bar{height:9px;background:#182536;border-radius:99px;overflow:hidden;margin:12px 0}.v9bar i{display:block;height:100%;background:#dce7f5}.v9big{font-size:38px;font-weight:900}
+</style>
+<div id="v9"><div class="v9w"><div class="v9h"><div><div class="v9t">ЦЕНТР ИСПЫТАНИЙ</div><div class="v9s">10 режимов • новые задания • рекорды и прогресс</div></div><button class="v9x" onclick="V9.close()">Закрыть</button></div><div id="v9root"></div></div></div>
+<script>
+const V9=(()=>{const K='vestige_top_v9';let s=JSON.parse(localStorage.getItem(K)||'null')||{xp:0,best:{},played:{},streak:0};const save=()=>localStorage.setItem(K,JSON.stringify(s));const add=x=>{s.xp+=x;let old=+localStorage.getItem('vestige_xp')||0;localStorage.setItem('vestige_xp',old+x);save()};const rnd=a=>a[Math.floor(Math.random()*a.length)],sh=a=>a.sort(()=>Math.random()-.5);const root=()=>document.getElementById('v9root');
+const modes=[['01','Инженерный вызов','Цепочка решений: анализ → материал → физика → проект.','logic'],['02','Лаборатория брони','Найди элементы конструкции. Описание и варианты меняются.','lab'],['03','Сборка под давлением','Собери систему в правильной последовательности.','assembly'],['04','Симулятор испытаний','Безопасный манекен и абстрактные показатели.','range'],['05','Материалы: выбор','Баланс массы, жёсткости и гибкости при новых условиях.','materials'],['06','Физический двигатель','Новые задачи с расчётами и числами.','physics'],['07','Разбор графика','Читай новые данные и делай вывод.','graph'],['08','Проектировщик','Выбери конфигурацию под требования сценария.','designer'],['09','Экзамен','Случайные вопросы и перемешанные ответы.','quiz'],['10','Серия испытаний','Комбо из разных задач и множитель за серию.','challenge']];
+function open(){document.getElementById('v9').style.display='block';home()}function close(){document.getElementById('v9').style.display='none'}
+function home(){root().innerHTML=`<div class="v9stat"><span class="v9pill">XP: <b>${s.xp}</b></span><span class="v9pill">Лучшая серия: <b>${s.streak}</b></span></div><div class="v9g">${modes.map(m=>`<div class="v9c"><div><small>${m[0]}</small><h3>${m[1]}</h3><p>${m[2]}</p></div><button class="v9b" onclick="V9.play('${m[3]}')">Запустить</button></div>`).join('')}</div>`}
+function panel(t,c){root().innerHTML=`<div class="v9p"><div class="v9h"><div><h2 style="margin:0">${t}</h2><div class="v9s">Новый раунд генерируется автоматически</div></div><button class="v9x" onclick="V9.home()">Все режимы</button></div>${c}</div>`}
+function done(m,score,gain){s.best[m]=Math.max(s.best[m]||0,score);s.played[m]=(s.played[m]||0)+1;s.streak++;add(gain);save();root().insertAdjacentHTML('beforeend',`<div class="v9p"><div class="v9big">+${gain} XP</div><p>Результат: <b>${score}</b> • личный рекорд: <b>${s.best[m]}</b></p><button class="v9b" onclick="V9.play('${m}')">Новый раунд</button> <button class="v9x" onclick="V9.home()">Меню</button></div>`)}
+function play(m){({logic,lab,assembly,range,materials,physics,graph,designer,quiz,challenge}[m])()}
+function logic(){let a=rnd([{q:'Система должна стать легче без потери баланса. Что проверить первым?',o:['Плотность и свойства материала','Цвет','Длину ремней'],c:0},{q:'Данные испытания неожиданно отличаются. Первый шаг?',o:['Проверить условия и исходные данные','Удалить результат','Удвоить все значения'],c:0},{q:'Есть несколько противоречивых требований. Что делать?',o:['Расставить приоритеты и сравнить компромиссы','Выбрать случайно','Игнорировать ограничения'],c:0}]);panel('Инженерный вызов',`<h3>${a.q}</h3><div class="v9o">${a.o.map((x,i)=>`<button onclick="V9.logicAns(${i},${a.c})">${x}</button>`).join('')}</div>`)}
+function logicAns(i,c){[...document.querySelectorAll('.v9o button')].forEach((b,j)=>b.classList.add(j===c?'good':'bad'));setTimeout(()=>done('logic',i===c?100:40,i===c?35:8),350)}
+function lab(){let a=rnd([['Плита','распределяет нагрузку'],['Плечевая лямка','удерживает систему'],['Крепёжная лента','фиксирует элементы'],['Подсумок','организует размещение']]),o=sh([a[0],...sh([['Плита'],['Плечевая лямка'],['Крепёжная лента'],['Подсумок']]).filter(x=>x[0]!==a[0]).slice(0,2).map(x=>x[0])]);panel('Лаборатория брони',`<p>Какой элемент соответствует описанию: <b>${a[1]}</b>?</p><div class="v9o">${o.map(x=>`<button onclick="V9.textAns(this,'${x}','${a[0]}','lab')">${x}</button>`).join('')}</div>`)}
+function textAns(el,a,c,m){[...document.querySelectorAll('.v9o button')].forEach(b=>b.classList.add(b.textContent===c?'good':'bad'));setTimeout(()=>done(m,a===c?100:45,a===c?30:7),350)}
+function assembly(){let st=['Проверить элементы','Определить порядок','Соединить систему','Проверить фиксацию'],o=sh(st.map((x,i)=>({x,i})));window._a={st,o,p:0,score:0};panel('Сборка под давлением',`<p>Нажимай этапы в логичном порядке. Ошибка сбрасывает серию.</p><div class="v9o">${o.map(x=>`<button data-i="${x.i}" onclick="V9.asm(${x.i})">${x.x}</button>`).join('')}</div>`)}
+function asm(i){let a=window._a;if(i===a.p){a.p++;a.score+=25;document.querySelector(`[data-i="${i}"]`).classList.add('good');if(a.p===a.st.length)done('assembly',a.score,45)}else{a.p=0;a.score=0;document.querySelectorAll('.v9o button').forEach(b=>b.classList.remove('good'));}}
+function range(){let st=55+Math.floor(Math.random()*40),fl=45+Math.floor(Math.random()*45),mass=(1.8+Math.random()*3).toFixed(1);window._r={st,fl};panel('Симулятор испытаний',`<p>Анализ безопасной абстрактной системы.</p><div class="v9stat"><span class="v9pill">Масса: <b>${mass} кг</b></span><span class="v9pill">Стабильность: <b>${st}%</b></span><span class="v9pill">Гибкость: <b>${fl}%</b></span></div><div class="v9bar"><i style="width:${st}%"></i></div><div class="v9o"><button onclick="V9.rangeAns(1)">Сделать легче</button><button onclick="V9.rangeAns(2)">Повысить жёсткость</button><button onclick="V9.rangeAns(3)">Сохранить баланс</button></div>`)}
+function rangeAns(n){let r=window._r,good=r.st>75&&r.fl>60?3:r.st>75?2:1;done('range',n===good?100:55,n===good?32:8)}
+function materials(){let a=rnd([0,1,2]),o=[['A','минимальная масса','средняя жёсткость'],['B','средняя масса','высокая жёсткость'],['C','высокая масса','высокая жёсткость']];panel('Материалы: выбор',`<p>Требование: <b>${a===0?'минимальная масса':a===1?'баланс':'максимальная жёсткость'}</b>.</p><div class="v9o">${o.map((x,i)=>`<button onclick="V9.mat(${i},${a})"><b>Материал ${x[0]}</b><br>${x[1]}<br>${x[2]}</button>`).join('')}</div>`)}
+function mat(i,c){done('materials',i===c?100:50,i===c?30:7)}
+function physics(){let m=2+Math.floor(Math.random()*9),v=4+Math.floor(Math.random()*17),e=.5*m*v*v,opts=sh([e,e+20,Math.max(1,e-20),e+50]);panel('Физический двигатель',`<p>Рассчитай кинетическую энергию по формуле <b>E = ½mv²</b>.</p><h2>${m} кг • ${v} м/с</h2><div class="v9o">${opts.map(x=>`<button onclick="V9.num(${x},${e},'physics')">${x} Дж</button>`).join('')}</div>`)}
+function num(a,c,m){done(m,a===c?100:40,a===c?35:6)}
+function graph(){let a=20+Math.floor(Math.random()*30),b=a+Math.floor(Math.random()*35),c=b-Math.floor(Math.random()*15);window._g={a,b,c};panel('Разбор графика',`<p>Значения: <b>${a} → ${b} → ${c}</b>. Какой вывод?</p><div class="v9bar"><i style="width:${a}%"></i></div><div class="v9bar"><i style="width:${b}%"></i></div><div class="v9bar"><i style="width:${c}%"></i></div><div class="v9o"><button onclick="V9.gans(1)">Сначала рост, затем снижение</button><button onclick="V9.gans(2)">Постоянное снижение</button><button onclick="V9.gans(3)">Постоянный рост</button></div>`)}
+function gans(n){done('graph',n===1?100:45,n===1?28:7)}
+function designer(){panel('Проектировщик',`<p>Сценарий: высокая подвижность и длительная работа. Выбери разумный баланс.</p><div class="v9o"><button onclick="V9.design(1)">Низкая масса + высокая гибкость</button><button onclick="V9.design(2)">Максимальная масса + максимальная жёсткость</button><button onclick="V9.design(3)">Случайная конфигурация</button></div>`)}
+function design(n){done('designer',n===1?100:45,n===1?38:8)}
+const bank=[['Какая величина измеряется в джоулях?',['Энергия','Масса','Время','Длина'],0],['Как зависит кинетическая энергия от скорости?',['Как квадрат скорости','Не зависит','Уменьшается','Только от времени'],0],['Что важно при инженерном выборе?',['Компромисс характеристик','Только вид','Только цена','Случайность'],0],['Что показывает график?',['Зависимость величин','Цвет','Номер детали','Название'],0],['Какая единица скорости?',['м/с','кг','Дж','с'],0],['Зачем повторять эксперимент?',['Проверить воспроизводимость','Увеличить текст','Изменить единицы','Скрыть ошибку'],0],['Что такое модель?',['Упрощённое представление системы','Всегда точная копия','Только фото','Случайные числа'],0],['Зачем нужны ограничения?',['Для поиска лучшего баланса','Без причины','Чтобы убрать расчёты','Чтобы не проверять'],0]];
+function quiz(){let qs=sh([...bank]).slice(0,5);window._q={qs,i:0,score:0};qnext()}
+function qnext(){let q=_q;if(q.i>=q.qs.length){done('quiz',q.score,Math.max(10,q.score/2));return}let x=q.qs[q.i],o=sh(x[1].map((z,j)=>({z,j})));panel('Экзамен',`<p>Вопрос ${q.i+1} из ${q.qs.length}</p><h3>${x[0]}</h3><div class="v9o">${o.map(z=>`<button onclick="V9.qans(${z.j},${x[2]})">${z.z}</button>`).join('')}</div>`)}
+function qans(i,c){if(i===c)_q.score+=20;_q.i++;qnext()}
+function challenge(){window._ch=0;cr(1)}
+function cr(n){if(n>5){let ok=_ch;_ch=0;done('challenge',ok*20,ok*12);return}let q=rnd([['2 + 3 × 4 = ?','14',['14','20','24']],['m=4 кг, v=5 м/с. E = ?','50',['50','20','100']],['Что важнее при сравнении решений?','условия',['условия','случайность','цвет']]]);panel('Серия испытаний',`<p>Раунд ${n}/5</p><h3>${q[0]}</h3><div class="v9o">${q[2].map(x=>`<button onclick="V9.ca('${x}','${q[1]}',${n})">${x}</button>`).join('')}</div>`)}
+function ca(a,c,n){if(a===c)_ch++;cr(n+1)}
+return{open,close,home,play,logicAns,textAns,asm,rangeAns,mat,num,gans,design,qans,challenge,ca}})();
+(function(){const b=document.getElementById('play');if(b){const n=document.createElement('button');n.className=b.className;n.textContent='ЦЕНТР ИГР • 10 РЕЖИМОВ';n.onclick=()=>V9.open();b.insertAdjacentElement('afterend',n)}})();
+</script>
+</body></html>

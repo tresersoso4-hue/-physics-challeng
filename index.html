@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Бронежилет — игры</title>
+<style>
+:root{color-scheme:dark;--bg:#14231c;--panel:#20352a;--line:#405847;--green:#527d55;--text:#f4f5ed;--muted:#c0cdbf}
+*{box-sizing:border-box}body{margin:0;padding:20px;font-family:Arial,sans-serif;background:linear-gradient(145deg,#101b16,#263d2d);color:var(--text)}
+main{max-width:760px;margin:auto}.hero,.panel{border:1px solid var(--line);border-radius:18px;padding:20px;margin-bottom:16px;background:var(--panel)}
+.hero{background:linear-gradient(130deg,#172e23,#52744d)}h1{font-size:clamp(28px,6vw,42px);margin:8px 0}.small{color:var(--muted);font-size:14px}
+nav{display:flex;gap:10px;margin-bottom:16px}button{border:0;border-radius:11px;padding:12px 16px;font-size:16px;font-weight:bold;cursor:pointer;background:#344b3a;color:white}button.primary{background:#648b5e}button:disabled{opacity:.5;cursor:not-allowed}
+nav button{flex:1}.choice{display:block;width:100%;text-align:left;margin:9px 0;background:#304638;border:1px solid var(--line)}.choice.correct{background:#246b43}.choice.wrong{background:#963d3d}
+.progress{height:8px;background:#435347;border-radius:20px;overflow:hidden;margin:12px 0}.progress div{height:100%;background:#9bc58c;width:10%}
+[hidden]{display:none!important}canvas{display:block;width:100%;height:auto;border-radius:12px;background:#101d19;touch-action:none}
+.controls{display:flex;gap:10px;margin-top:10px}.controls button{flex:1}footer{text-align:center;color:var(--muted);font-size:13px;padding:10px}
+</style>
+</head>
+<body>
+<main>
+<header class="hero">
+<div class="small">ОБУЧАЮЩИЙ ИГРОВОЙ ПРОЕКТ</div>
+<h1>🛡️ БРОНЕЖИЛЕТ</h1>
+<p>Проверь свои знания и испытай реакцию!</p>
+<div class="small">Автор: Махкамов А. Ю. • 2.26</div>
+</header>
+<nav><button class="primary" id="quizTab">📝 Викторина</button><button id="gameTab">🎮 Игра</button></nav>
+<section class="panel" id="quiz">
+<h2>📝 Викторина про бронежилет</h2>
+<div class="small" id="qCount">Вопрос 1 / 10</div><div class="progress"><div id="progress"></div></div>
+<div id="quizContent"><h3 id="question"></h3><div id="answers"></div><p id="feedback" aria-live="polite"></p><button class="primary" id="next" disabled>Следующий вопрос →</button></div>
+<div id="result" hidden><h2>🏆 Викторина завершена!</h2><h3 id="score"></h3><p id="comment"></p><button class="primary" id="restartQuiz">🔄 Новые 10 вопросов</button></div>
+</section>
+<section class="panel" id="game" hidden>
+<h2>🎮 Уклоняйся от пуль</h2><p class="small">Двигайся влево и вправо, избегай падающих препятствий и набирай очки.</p>
+<h3>⭐ Очки: <span id="gameScore">0</span></h3>
+<canvas id="field" width="600" height="440" aria-label="Игровое поле"></canvas>
+<div class="controls"><button id="left">⬅ Влево</button><button id="right">Вправо ➡</button></div>
+<p id="gameMessage" class="small" aria-live="polite">Нажми «Начать игру»!</p><button class="primary" id="startGame">▶ Начать игру</button>
+<p class="small">Управление: клавиши ← → или экранные кнопки.</p>
+</section>
+<footer>Учебный проект • 2026 • Махкамов А. Ю. — 2.26</footer>
+</main>
+<script>
+const bank=[
+['Для чего предназначен бронежилет?',['Для защиты тела от поражающих элементов','Для плавания','Для переноски воды','Для связи'],0],
+['Какие части тела обычно защищает бронежилет?',['Голову и ноги','Грудь, спину и иногда бока','Только руки','Только шею'],1],
+['Что означает класс защиты бронежилета?',['Его цвет','Уровень защитных свойств по стандарту','Его размер','Вес'],1],
+['Из чего могут изготавливать бронепанели?',['Из бумаги','Из керамики или специальных металлических материалов','Из картона','Из стекла для окон'],1],
+['Почему важно правильно подбирать размер бронежилета?',['Чтобы он лучше выглядел','Чтобы обеспечить правильное расположение защиты','Чтобы он был ярче','Чтобы он не имел застёжек'],1],
+['Можно ли считать бронежилет полной гарантией безопасности?',['Да, всегда','Нет, он снижает риск травм, но не гарантирует безопасность','Да, от любых опасностей','Только ночью'],1],
+['Что следует делать после повреждения бронепанели?',['Продолжать использовать без проверки','Проверить и заменить согласно инструкции производителя','Покрасить её','Спрятать повреждение'],1],
+['Зачем бронежилету нужны регулируемые ремни?',['Для украшения','Для правильной фиксации на теле','Для хранения еды','Для увеличения роста'],1],
+['Как нужно хранить бронежилет?',['В соответствии с инструкцией производителя, в сухом месте','В воде','На сильном морозе постоянно','Под прямым солнцем'],0],
+['От чего зависит эффективность бронежилета?',['От цвета','От класса защиты, состояния и правильного использования','От имени владельца','От времени суток'],1],
+['Что такое бронеплита?',['Защитный элемент бронежилета','Часть обуви','Зарядное устройство','Рюкзак'],0],
+['Нужно ли проверять состояние бронежилета?',['Нет','Да, регулярно и после возможных повреждений','Только раз в десять лет','Только перед стиркой'],1],
+['Что важнее при выборе бронежилета?',['Модный цвет','Соответствие задаче, размер и подтверждённый класс защиты','Самая низкая цена','Наличие рисунка'],1],
+['Может ли бронежилет быть неудобным при неправильной регулировке?',['Да','Нет','Только летом','Только зимой'],0],
+['Для чего некоторые бронежилеты имеют боковые защитные элементы?',['Для дополнительной защиты боковых частей тела','Для украшения','Для хранения телефона','Для увеличения веса'],0]
+];
+const $=id=>document.getElementById(id);let questions=[],qi=0,points=0,answered=false;
+function shuffle(a){a=[...a];for(let i=a.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function startQuiz(){questions=shuffle(bank).slice(0,10);qi=0;points=0;$('result').hidden=true;$('quizContent').hidden=false;renderQuestion()}
+function renderQuestion(){answered=false;let q=questions[qi];$('qCount').textContent=`Вопрос ${qi+1} / 10`;$('progress').style.width=(qi+1)*10+'%';$('question').textContent=q[0];$('feedback').textContent='';$('next').disabled=true;$('next').textContent=qi===9?'Посмотреть результат':'Следующий вопрос →';let options=shuffle(q[1].map((v,i)=>({v,correct:i===q[2]})));$('answers').replaceChildren();options.forEach(o=>{let b=document.createElement('button');b.className='choice';b.textContent=o.v;b.onclick=()=>answer(o,b);$('answers').append(b)})}
+function answer(o,btn){if(answered)return;answered=true;if(o.correct)points++;[...$('answers').children].forEach(b=>{b.disabled=true;if(b.textContent===questions[qi][1][questions[qi][2]])b.classList.add('correct');else if(b===btn)b.classList.add('wrong')});$('feedback').textContent=o.correct?'✅ Правильно!':'❌ Правильный ответ: '+questions[qi][1][questions[qi][2]];$('next').disabled=false}
+$('next').onclick=()=>{if(!answered)return;qi++;if(qi<10)renderQuestion();else{$('quizContent').hidden=true;$('result').hidden=false;$('score').textContent=`Твой результат: ${points} из 10`;$('comment').textContent=points>=9?'Отличный результат!':points>=6?'Хорошая работа! Повтори некоторые вопросы.':'Попробуй ещё раз — знания приходят с практикой.'}};
+$('restartQuiz').onclick=startQuiz;
+$('quizTab').onclick=()=>show('quiz');$('gameTab').onclick=()=>show('game');
+function show(which){$('quiz').hidden=which!=='quiz';$('game').hidden=which!=='game';$('quizTab').classList.toggle('primary',which==='quiz');$('gameTab').classList.toggle('primary',which==='game');if(which==='game')draw()}
+const canvas=$('field'),ctx=canvas.getContext('2d');let player=300,bullets=[],running=false,score=0,frame=0,keys={left:false,right:false},raf=0;
+function draw(){ctx.clearRect(0,0,600,440);ctx.fillStyle='#172b24';ctx.fillRect(0,0,600,440);ctx.strokeStyle='#314a3b';for(let x=20;x<600;x+=40){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,440);ctx.stroke()}for(let y=20;y<440;y+=40){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(600,y);ctx.stroke()}ctx.fillStyle='#c3d4c1';ctx.font='14px Arial';ctx.fillText('УКЛОНЯЙСЯ ОТ ПРЕПЯТСТВИЙ',15,24);bullets.forEach(b=>{ctx.fillStyle='#f4a43c';ctx.beginPath();ctx.ellipse(b.x,b.y,7,13,0,0,Math.PI*2);ctx.fill();ctx.fillStyle='#ffe6a5';ctx.fillRect(b.x-2,b.y-12,4,8)});ctx.font='34px Arial';ctx.textAlign='center';ctx.fillText('🪖',player,402);ctx.fillText('🛡️',player,428);ctx.textAlign='left';if(!running){ctx.fillStyle='rgba(0,0,0,.55)';ctx.fillRect(0,150,600,110);ctx.fillStyle='white';ctx.textAlign='center';ctx.font='bold 25px Arial';ctx.fillText('ГОТОВ К ИГРЕ?',300,195);ctx.font='16px Arial';ctx.fillText('Уворачивайся от падающих препятствий!',300,225);ctx.textAlign='left'}}
+function tick(){if(!running)return;frame++;if(keys.left)player-=5;if(keys.right)player+=5;player=Math.max(30,Math.min(570,player));if(frame%32===0)bullets.push({x:30+Math.random()*540,y:-15,s:3+Math.random()*2});bullets.forEach(b=>b.y+=b.s+Math.min(score/150,3));bullets=bullets.filter(b=>b.y<460);if(bullets.some(b=>Math.abs(b.x-player)<22&&b.y>380&&b.y<440)){endGame();return}if(frame%8===0){score++;$('gameScore').textContent=score}draw();raf=requestAnimationFrame(tick)}
+function endGame(){running=false;cancelAnimationFrame(raf);$('gameMessage').textContent='💥 Игра окончена! Ты набрал '+score+' очков.';$('startGame').textContent='🔄 Играть снова';draw()}
+$('startGame').onclick=()=>{cancelAnimationFrame(raf);player=300;bullets=[];score=0;frame=0;running=true;keys.left=keys.right=false;$('gameScore').textContent='0';$('gameMessage').textContent='Игра началась! Берегись!';$('startGame').textContent='Игра идёт…';draw();tick()};
+function hold(id,dir){let el=$(id);el.addEventListener('pointerdown',e=>{e.preventDefault();keys[dir]=true});['pointerup','pointerleave','pointercancel'].forEach(ev=>el.addEventListener(ev,()=>keys[dir]=false))}
+hold('left','left');hold('right','right');document.addEventListener('keydown',e=>{if(e.key==='ArrowLeft'||e.key==='ArrowRight'){keys[e.key==='ArrowLeft'?'left':'right']=true;e.preventDefault()}});document.addEventListener('keyup',e=>{if(e.key==='ArrowLeft')keys.left=false;if(e.key==='ArrowRight')keys.right=false});
+startQuiz();draw();
+</script>
+</body></html>
